@@ -3,32 +3,25 @@ import Link from "next/link";
 
 const features = [
   {
+    id: 1,
     title: "Crea afiches en minutos",
     body: "Elige un formato, escribe el producto y el precio. Rotula acomoda todo con letras grandes y claras, listas para imprimir en carta o A4.",
     tint: "bg-accent-100",
     ink: "text-accent-700",
-    paths: ["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"],
   },
   {
+    id: 2,
     title: "Descarga lista para imprimir",
     body: "Genera un PDF con tu rótulo ya armado, en carta o A4. Ábrelo, imprímelo y ya está listo para tu vitrina.",
     tint: "bg-accent2-100",
     ink: "text-accent2-700",
-    paths: [
-      "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
-      "M7 10l5 5 5-5",
-      "M12 15V3",
-    ],
   },
   {
+    id: 3,
     title: "Tu cuenta, tus rótulos",
     body: "Regístrate y guarda cada afiche. Duplica la oferta de la semana pasada, cambia el precio y vuelve a imprimir.",
     tint: "bg-neutral-200",
     ink: "text-neutral-800",
-    paths: [
-      "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2",
-      "M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z",
-    ],
   },
 ];
 
@@ -56,23 +49,7 @@ const steps = [
   },
 ];
 
-function Icon({ paths, className = "w-6 h-6" }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {paths.map((d, i) => (
-        <path key={i} d={d} />
-      ))}
-    </svg>
-  );
-}
+
 
 function PosterSample() {
   return (
@@ -90,16 +67,7 @@ function PosterSample() {
           por libra · antes <s>$1.49</s>
         </div>
         <div className="mt-3.5 inline-flex items-center justify-center gap-2 self-center rounded-full bg-neutral-200 px-3.5 py-2 text-xs font-semibold">
-          <Icon
-            className="h-4 w-4"
-            paths={[
-              "M3 7V5a2 2 0 0 1 2-2h2",
-              "M17 3h2a2 2 0 0 1 2 2v2",
-              "M21 17v2a2 2 0 0 1-2 2h-2",
-              "M7 21H5a2 2 0 0 1-2-2v-2",
-              "M7 12h10",
-            ]}
-          />
+          <i class="fa-jelly-duo fa-regular fa-calendar"></i>
           Válido hasta el domingo
         </div>
       </div>
@@ -162,11 +130,10 @@ export default function LandingPage() {
                 key={f.title}
                 className="flex flex-col gap-3.5 rounded-[28px] bg-surface p-7"
               >
-                <div
-                  className={`grid h-13 w-13 place-items-center rounded-full ${f.tint} ${f.ink}`}
-                >
-                  <Icon paths={f.paths} />
-                </div>
+                
+                  {f.id == 1 && <i class="fa-jelly-duo text-3xl fa-regular fa-pencil"></i> }
+                  {f.id == 2 && <i class="fa-jelly-duo text-3xl fa-regular fa-arrow-down-to-line"></i> }
+                  {f.id ==3  && <i class="fa-jelly-duo text-3xl fa-regular fa-circle-user"></i> }
                 <h3 className="font-heading text-[22px] font-bold">{f.title}</h3>
                 <p className="leading-relaxed text-neutral-800">{f.body}</p>
               </div>

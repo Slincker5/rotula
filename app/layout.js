@@ -1,5 +1,5 @@
-import "./globals.css";
-import "./estilos.css";
+import "@/app/globals.css";
+import "@/app/estilos.css";
 import Menu from "@/components/Menu";
 import Footer from "@/components/Footer";
 export const metadata = {
