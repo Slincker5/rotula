@@ -1,7 +1,7 @@
 import Link from 'next/link'
 const Menu = () => {
     return (
-        <header className='px-4 py-6 bg-white flex items-center justify-between border-b-[#c9c9c9] border-b'>
+        <header className='px-4 py-6 bg-white flex items-center justify-between border-b-[#c9c9c9] border-b sticky top-0 z-50'>
             <h1 className='font-bold'>
                 ROTULA<span className='text-orange-500'>.APP</span>
             </h1>
