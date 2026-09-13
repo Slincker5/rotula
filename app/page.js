@@ -116,28 +116,6 @@ const btnGhost = `${btnBase} px-3 text-black hover:bg-neutral-100 active:bg-neut
 export default function LandingPage() {
   return (
     <>
-      <nav className="flex items-center gap-6 border-b border-neutral-300 bg-white px-5 py-4 sm:px-8 lg:px-16">
-        <div className="mx-auto flex w-full max-w-[1200px] items-center gap-6">
-          <span className="mr-auto font-heading text-lg font-bold">Rotula</span>
-          <a href="#funciones" className="text-sm hover:text-accent2-600">
-            Funciones
-          </a>
-          <a href="#como" className="text-sm hover:text-accent2-600">
-            Cómo funciona
-          </a>
-          <a href="#precios" className="text-sm hover:text-accent2-600">
-            Precios
-          </a>
-          <div className="ml-auto flex items-center gap-2">
-            <Link href="/login" className={btnGhost}>
-              Iniciar sesión
-            </Link>
-            <Link href="/register" className={btnPrimary}>
-              Registrarse
-            </Link>
-          </div>
-        </div>
-      </nav>
 
       <main className="mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-16">
         {/* Hero */}
@@ -256,22 +234,6 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-
-        <footer className="flex flex-wrap items-center justify-between gap-3 gap-x-7 py-12 text-[13px] text-neutral-700">
-          <span className="font-heading text-lg font-bold text-black">Rotula</span>
-          <div className="flex gap-6">
-            <a href="#funciones" className="hover:text-accent2-600">
-              Funciones
-            </a>
-            <a href="#como" className="hover:text-accent2-600">
-              Cómo funciona
-            </a>
-            <a href="#precios" className="hover:text-accent2-600">
-              Precios
-            </a>
-          </div>
-          <span>© 2026 Rotula</span>
-        </footer>
       </main>
     </>
   );

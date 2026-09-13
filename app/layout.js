@@ -1,5 +1,7 @@
 import "./globals.css";
 import "./estilos.css";
+import Menu from "@/components/Menu";
+import Footer from "@/components/Footer";
 export const metadata = {
   title: "Rotula - Inicio",
   description: "Afiches de ofertas en minutos",
@@ -15,7 +17,13 @@ export default function Inicio({ children }) {
           crossOrigin="anonymous"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <div class="grid grid-rows-[auto_1fr_auto] h-[100vh] fixed w-full overflow-scroll">
+          <Menu></Menu>
+          {children}
+          <Footer></Footer>
+        </div>
+        </body>
     </html>
   );
 }
