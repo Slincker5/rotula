@@ -3,11 +3,10 @@ import "@/app/estilos.css";
 import Menu from "@/components/Menu";
 import Footer from "@/components/Footer";
 export const metadata = {
-  title: "Rotula - Inicio",
-  description: "Afiches de ofertas en minutos",
+  title: "Rotula - Home",
 };
 
-export default function Inicio({ children }) {
+export default function Home({ children }) {
   return (
     <html lang="es">
       <head>
@@ -18,13 +17,8 @@ export default function Inicio({ children }) {
         />
       </head>
       <body>
-        <div class="grid grid-rows-[auto_1fr_auto] h-[100vh] fixed w-full overflow-scroll">
-          <Menu></Menu>
-          {children}
-          <Footer></Footer>
-        </div>
+          {children}     
         </body>
     </html>
   );
 }
-

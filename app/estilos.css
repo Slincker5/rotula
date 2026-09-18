@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
+
+@theme {
+  --color-surface: #f7f7f5;
+
+  --color-neutral-100: #fafafa;
+  --color-neutral-200: #f2f2f0;
+  --color-neutral-300: #e6e6e3;
+  --color-neutral-400: #d0d0cc;
+  --color-neutral-500: #a3a39e;
+  --color-neutral-600: #7a7a75;
+  --color-neutral-700: #5c5c58;
+  --color-neutral-800: #333331;
+  --color-neutral-900: #161615;
+
+  --color-accent-100: #f2f2f0;
+  --color-accent-200: #e6e6e3;
+  --color-accent-300: #cfcfcb;
+  --color-accent-400: #7a7a75;
+  --color-accent-500: #111111;
+  --color-accent-600: #2a2a28;
+  --color-accent-700: #111111;
+  --color-accent-800: #000000;
+  --color-accent-900: #000000;
+
+  --color-accent2-100: #fdf1ec;
+  --color-accent2-200: #f9dccf;
+  --color-accent2-300: #f2b59c;
+  --color-accent2-400: #ea7f56;
+  --color-accent2-500: #e2502a;
+  --color-accent2-600: #c84320;
+  --color-accent2-700: #a5361a;
+  --color-accent2-800: #7d2a15;
+  --color-accent2-900: #4f1a0d;
+
+  --font-heading: "Figtree", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(-2deg); }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
