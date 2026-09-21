@@ -15,7 +15,11 @@ export async function GET() {
     const usuarioSesion = await getUser();
 
     const [rows] = await pool.query(
-      `SELECT id, uuid, titulo, rotulos_por_hoja, total_rotulos, url_pdf, fecha_creacion
+      // el link se arma con el uuid: los documentos viejos guardaron la ruta de un
+      // archivo en disco que ya no existe
+      `SELECT id, uuid, titulo, rotulos_por_hoja, total_rotulos,
+              CONCAT('/api/documentos/', uuid, '/pdf') AS url_pdf,
+              fecha_creacion
          FROM documentos
         WHERE usuario_id = ?
         ORDER BY id DESC`,
