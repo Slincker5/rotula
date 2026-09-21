@@ -1,5 +1,5 @@
 import "@/app/globals.css";
-import "@/app/estilos.css";
+import { Toaster } from "sonner";
 import Menu from "@/components/Menu";
 import Footer from "@/components/Footer";
 export const metadata = {
@@ -18,11 +18,12 @@ export default function Inicio({ children }) {
         />
       </head>
       <body>
-        <div class="grid grid-rows-[auto_1fr_auto] h-[100vh] fixed w-full overflow-scroll">
+        <div className="grid grid-rows-[auto_1fr_auto] h-[100vh] fixed w-full overflow-scroll">
           <Menu></Menu>
           {children}
           <Footer></Footer>
         </div>
+        <Toaster position="top-right" richColors />
         </body>
     </html>
   );

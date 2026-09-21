@@ -67,7 +67,7 @@ function PosterSample() {
           por libra · antes <s>$1.49</s>
         </div>
         <div className="mt-3.5 inline-flex items-center justify-center gap-2 self-center rounded-full bg-neutral-200 px-3.5 py-2 text-xs font-semibold">
-          <i class="fa-jelly-duo fa-regular fa-calendar"></i>
+          <i className="fa-jelly-duo fa-regular fa-calendar"></i>
           Válido hasta el domingo
         </div>
       </div>
@@ -75,11 +75,6 @@ function PosterSample() {
   );
 }
 
-const btnBase =
-  "inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm px-5 py-2.5 transition-colors";
-const btnPrimary = `${btnBase} bg-black text-white hover:bg-neutral-800 active:bg-neutral-900`;
-const btnSecondary = `${btnBase} border border-neutral-300 text-black hover:bg-neutral-100 active:bg-neutral-200`;
-const btnGhost = `${btnBase} px-3 text-black hover:bg-neutral-100 active:bg-neutral-200`;
 
 export default function LandingPage() {
   return (
@@ -99,10 +94,10 @@ export default function LandingPage() {
               plantillas complicadas.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/register" className={btnPrimary}>
+              <Link href="/registro" className="inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm px-5 py-2.5 transition-colors bg-black text-white hover:bg-neutral-800 active:bg-neutral-900">
                 Crear mi primer rótulo
               </Link>
-              <Link href="/login" className={btnSecondary}>
+              <Link href="/login" className="inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm px-5 py-2.5 transition-colors border border-neutral-300 text-black hover:bg-neutral-100 active:bg-neutral-200">
                 Ya tengo cuenta
               </Link>
             </div>
@@ -131,9 +126,9 @@ export default function LandingPage() {
                 className="flex flex-col gap-3.5 rounded-[28px] bg-surface p-7"
               >
                 
-                  {f.id == 1 && <i class="fa-jelly-duo text-3xl fa-regular fa-pencil"></i> }
-                  {f.id == 2 && <i class="fa-jelly-duo text-3xl fa-regular fa-arrow-down-to-line"></i> }
-                  {f.id ==3  && <i class="fa-jelly-duo text-3xl fa-regular fa-circle-user"></i> }
+                  {f.id == 1 && <i className="fa-jelly-duo text-3xl fa-regular fa-pencil"></i> }
+                  {f.id == 2 && <i className="fa-jelly-duo text-3xl fa-regular fa-arrow-down-to-line"></i> }
+                  {f.id ==3  && <i className="fa-jelly-duo text-3xl fa-regular fa-circle-user"></i> }
                 <h3 className="font-heading text-[22px] font-bold">{f.title}</h3>
                 <p className="leading-relaxed text-neutral-800">{f.body}</p>
               </div>
@@ -192,10 +187,10 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link href="/register" className={btnPrimary}>
+              <Link href="/registro" className="inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm px-5 py-2.5 transition-colors bg-black text-white hover:bg-neutral-800 active:bg-neutral-900">
                 Registrarse
               </Link>
-              <Link href="/login" className={btnGhost}>
+              <Link href="/login" className="inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm px-3 py-2.5 transition-colors text-black hover:bg-neutral-100 active:bg-neutral-200">
                 Iniciar sesión
               </Link>
             </div>
