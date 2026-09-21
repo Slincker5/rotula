@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -10,10 +11,35 @@ const enlaces = [
   { href: "/home/historial", texto: "Historial", icono: "fa-clock" },
 ];
 
+// solo se muestra si /api/admin responde ok (la sesion tiene rol admin)
+const enlaceAdmin = { href: "/home/admin", texto: "Admin", icono: "fa-shield-check" };
+
 const Menu = () => {
   const pathname = usePathname();
   const router = useRouter();
   const dentro = pathname.startsWith("/home");
+  const [esAdmin, setEsAdmin] = useState(false);
+
+  const verificarAdmin = async () => {
+    // fuera de /home no hay sesion que revisar, se limpia por si venia de un logout
+    if (!dentro) {
+      setEsAdmin(false);
+      return;
+    }
+    try {
+      await axios.get("/api/admin");
+      setEsAdmin(true);
+    } catch {
+      setEsAdmin(false);
+    }
+  };
+
+  // cada vez que entro o salgo de /home vuelvo a revisar el rol (cambia con el login)
+  useEffect(() => {
+    // el setState de verificarAdmin ocurre despues del await, no dentro del efecto
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    verificarAdmin();
+  }, [dentro]);
 
   const logout = async () => {
     try {
@@ -45,6 +71,17 @@ const Menu = () => {
               {e.texto}
             </Link>
           ))}
+          {esAdmin && (
+            <Link
+              href={enlaceAdmin.href}
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl ${
+                pathname.startsWith(enlaceAdmin.href) ? "bg-neutral-200" : "hover:bg-neutral-100"
+              }`}
+            >
+              <i className={`fa-jelly-duo fa-regular ${enlaceAdmin.icono}`}></i>
+              {enlaceAdmin.texto}
+            </Link>
+          )}
           <button
             type="button"
             onClick={logout}
