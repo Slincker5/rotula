@@ -3,12 +3,10 @@
  * ----------------------------
  * 1. trae los rótulos pendientes del usuario de la sesión
  * 2. genera el PDF sobre la plantilla (4 por hoja A4)
- * 3. lo guarda y registra el documento
- * 4. devuelve el link para descargar
+ * 3. registra el documento (el archivo no se guarda en disco)
+ * 4. devuelve el link para descargar: /api/documentos/[uuid]/pdf
  */
 
-import fs from "node:fs/promises";
-import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 import pool from "@/lib/db";
@@ -17,7 +15,6 @@ import { getUser } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
-const CARPETA = path.join(process.cwd(), "public", "rotulos");
 const POR_HOJA = 4;
 
 export async function POST() {
@@ -47,16 +44,13 @@ export async function POST() {
       return Response.json({ error: "No tenés rótulos para imprimir" }, { status: 404 });
     }
 
-    /* 2. pintar sobre la plantilla */
-    const bytes = await generarRotulos(rotulos);
+    /* 2. pintar sobre la plantilla: si esto falla no se registra nada */
+    await generarRotulos(rotulos);
 
-    /* 3. guardar el archivo */
+    /* 3. el archivo no se guarda (en Vercel el disco es de solo lectura):
+          el link apunta al endpoint que lo vuelve a pintar cuando se pide */
     const uuid = randomUUID();
-    const nombre = `${uuid}.pdf`;
-    const url = `/rotulos/${nombre}`;
-
-    await fs.mkdir(CARPETA, { recursive: true });
-    await fs.writeFile(path.join(CARPETA, nombre), bytes);
+    const url = `/api/documentos/${uuid}/pdf`;
 
     /* 3.1 registrar el documento */
     const total = rotulos.reduce((t, r) => t + Math.max(1, Number(r.copias) || 1), 0);
