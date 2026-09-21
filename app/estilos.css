@@ -1,5 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
-
+/* este archivo se importa desde globals.css (ahi tambien se carga la fuente Figtree) */
+.titulos {
+  font-family: "Figtree", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+}
 @theme {
   --color-surface: #f7f7f5;
 
@@ -50,5 +55,7 @@ html {
 
 body {
   font-family: var(--font-body);
+  background-color: #ffffff;
+  color: var(--color-neutral-900);
 }
 
