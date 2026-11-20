@@ -1,33 +1,31 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cargando from "@/components/loading";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
+import { useSesion } from "@/components/Sesion";
+import BotonGoogle from "@/components/BotonGoogle";
+
 const Login = () => {
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [cargando, setCargando] = useState(false);
   const router = useRouter();
+  const { usuario, iniciarSesion } = useSesion();
+
+  // con sesion abierta (correo o Google) se pasa directo a /home
+  useEffect(() => {
+    if (usuario) router.replace("/home");
+  }, [usuario, router]);
 
   const login = async (e) => {
     e.preventDefault();
     try {
       setCargando(true);
-      const body = {
-        email: correo,
-        password: clave,
-      };
-      const { data } = await axios.post("/api/login", body);
-      if (!data.ok) {
-        toast.error(data.error);
-      } else {
-        router.push("/home");
-      }
+      await iniciarSesion(correo, clave);
     } catch (error) {
-      // la API responde 400/401 con el motivo y axios lo lanza como error
-      toast.error(error.response?.data?.error ?? "No se pudo iniciar sesion");
+      toast.error(error.message);
     } finally {
       setCargando(false);
     }
@@ -91,6 +89,7 @@ const Login = () => {
             <i className="fa-jelly-duo fa-regular fa-arrow-right-to-bracket"></i>
             Iniciar sesion
           </button>
+          <BotonGoogle />
           <p className="mt-5 text-sm">
             ¿Aun no tienes cuenta?{" "}
             <Link href="/registro" className="font-semibold text-orange-500">

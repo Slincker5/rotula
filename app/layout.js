@@ -2,6 +2,7 @@ import "@/app/globals.css";
 import { Toaster } from "sonner";
 import Menu from "@/components/Menu";
 import Footer from "@/components/Footer";
+import { ProveedorSesion } from "@/components/Sesion";
 export const metadata = {
   title: "Rotula - Inicio",
   description: "Afiches de ofertas en minutos",
@@ -18,13 +19,15 @@ export default function Inicio({ children }) {
         />
       </head>
       <body>
-        <div className="grid grid-rows-[auto_1fr_auto] h-[100vh] fixed w-full overflow-scroll">
-          <Menu></Menu>
-          {children}
-          <Footer></Footer>
-        </div>
+        <ProveedorSesion>
+          <div className="grid grid-rows-[auto_1fr_auto] h-[100vh] fixed w-full overflow-scroll">
+            <Menu></Menu>
+            {children}
+            <Footer></Footer>
+          </div>
+        </ProveedorSesion>
         <Toaster position="top-right" richColors />
-        </body>
+      </body>
     </html>
   );
 }

@@ -1,9 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import axios from "axios";
+import { useSesion } from "@/components/Sesion";
 
 const enlaces = [
   { href: "/home", texto: "Inicio", icono: "fa-house" },
@@ -11,42 +10,22 @@ const enlaces = [
   { href: "/home/historial", texto: "Historial", icono: "fa-clock" },
 ];
 
-// solo se muestra si /api/admin responde ok (la sesion tiene rol admin)
+// solo se muestra si el perfil de Firestore (usuarios/{uid}) tiene rol "admin"
 const enlaceAdmin = { href: "/home/admin", texto: "Admin", icono: "fa-shield-check" };
 
 const Menu = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const dentro = pathname.startsWith("/home");
-  const [esAdmin, setEsAdmin] = useState(false);
-
-  const verificarAdmin = async () => {
-    // fuera de /home no hay sesion que revisar, se limpia por si venia de un logout
-    if (!dentro) {
-      setEsAdmin(false);
-      return;
-    }
-    try {
-      await axios.get("/api/admin");
-      setEsAdmin(true);
-    } catch {
-      setEsAdmin(false);
-    }
-  };
-
-  // cada vez que entro o salgo de /home vuelvo a revisar el rol (cambia con el login)
-  useEffect(() => {
-    // el setState de verificarAdmin ocurre despues del await, no dentro del efecto
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    verificarAdmin();
-  }, [dentro]);
+  const { usuario, cerrarSesion } = useSesion();
+  const dentro = pathname.startsWith("/home") && Boolean(usuario);
+  const esAdmin = usuario?.rol === "admin";
 
   const logout = async () => {
     try {
-      await axios.post("/api/logout");
+      await cerrarSesion();
       router.push("/login");
     } catch (error) {
-      toast.error("No se pudo cerrar la sesion");
+      toast.error(error.message);
     }
   };
 

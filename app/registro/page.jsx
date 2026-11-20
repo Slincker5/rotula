@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cargando from "@/components/loading";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
+import { useSesion } from "@/components/Sesion";
+import BotonGoogle from "@/components/BotonGoogle";
 
 const Registro = () => {
   const [nombre, setNombre] = useState("");
@@ -15,6 +16,12 @@ const Registro = () => {
   const [confirmar, setConfirmar] = useState("");
   const [cargando, setCargando] = useState(false);
   const router = useRouter();
+  const { usuario, registrar: crearCuenta } = useSesion();
+
+  // al crear la cuenta Firebase ya deja la sesion abierta, asi que se pasa a /home
+  useEffect(() => {
+    if (usuario) router.replace("/home");
+  }, [usuario, router]);
 
   const registrar = async (e) => {
     e.preventDefault();
@@ -22,24 +29,17 @@ const Registro = () => {
       toast.error("Las contraseñas no coinciden");
       return;
     }
+    // misma regla que la app movil: minimo 8 caracteres con letras y numeros
+    if (clave.length < 8 || !/[a-zA-Z]/.test(clave) || !/\d/.test(clave)) {
+      toast.error("La contraseña debe tener al menos 8 caracteres, con letras y números");
+      return;
+    }
     try {
       setCargando(true);
-      const body = {
-        nombre,
-        apellido,
-        email: correo,
-        nombre_negocio: negocio,
-        password_hash: clave,
-      };
-      const { data } = await axios.post("/api/registro", body);
-      if (!data.ok) {
-        toast.error(data.error);
-      } else {
-        toast.success("Cuenta creada, ahora inicia sesion");
-        router.push("/login");
-      }
+      await crearCuenta({ nombre, apellido, negocio, correo, clave });
+      toast.success("Cuenta creada, ¡bienvenido!");
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo crear la cuenta");
+      toast.error(error.message);
     } finally {
       setCargando(false);
     }
@@ -167,6 +167,7 @@ const Registro = () => {
             <i className="fa-jelly-duo fa-regular fa-circle-user"></i>
             Crear mi cuenta
           </button>
+          <BotonGoogle />
           <p className="mt-5 text-sm">
             ¿Ya tienes cuenta?{" "}
             <Link href="/login" className="font-semibold text-orange-500">
