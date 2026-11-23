@@ -7,6 +7,7 @@ import BotonPdf from "@/components/BotonPdf";
 import { useSesion } from "@/components/Sesion";
 import { deTextoFecha } from "@/lib/fechas";
 import { listarDocumentos, listarRotulos } from "@/lib/rotulos";
+import { plural } from "@/lib/plural";
 import Cargando from "@/components/loading";
 
 const monthlyLimit = 10;
@@ -152,7 +153,7 @@ const Home = () => {
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{d.titulo}</div>
                   <div className="text-[13px] text-neutral-700">
-                    {d.total_rotulos} rótulos · {fechaLarga(d.fecha_creacion)}
+                    {plural(d.total_rotulos, "rótulo", "rótulos")} · {fechaLarga(d.fecha_creacion)}
                   </div>
                 </div>
                 <BotonPdf documentoId={d.id} />

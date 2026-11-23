@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import BotonPdf from "@/components/BotonPdf";
 import { listarDocumentos } from "@/lib/rotulos";
+import { plural } from "@/lib/plural";
 
 const fechaLarga = (valor) =>
   new Date(valor).toLocaleDateString("es", {
@@ -73,7 +74,7 @@ const Historial = () => {
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{d.titulo}</div>
                   <div className="text-[13px] text-neutral-700">
-                    {d.total_rotulos} rótulos · {hojas} {hojas === 1 ? "hoja" : "hojas"} ·{" "}
+                    {plural(d.total_rotulos, "rótulo", "rótulos")} · {plural(hojas, "hoja", "hojas")} ·{" "}
                     {fechaLarga(d.fecha_creacion)}
                   </div>
                 </div>

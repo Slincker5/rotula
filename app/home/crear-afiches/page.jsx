@@ -6,6 +6,7 @@ import Link from "next/link";
 import { agregarRotulo, editarRotulo, generarDocumento, listarPendientes, quitarRotulo } from "@/lib/rotulos";
 import { descargarPdf } from "@/lib/pdf/generarRotulos";
 import { enDias, fechaCorta } from "@/lib/fechas";
+import { plural } from "@/lib/plural";
 import { listarProductos } from "@/lib/productos";
 
 const POR_HOJA = 4;
@@ -133,7 +134,7 @@ const CrearAfiches = () => {
       descargarPdf(bytes, `rotulos-${data.id}.pdf`);
       // enlace para volver a abrirlo sin generarlo otra vez
       setDocumento({ ...data, url: URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })) });
-      toast.success(`PDF listo: ${data.rotulos} rotulos en ${data.hojas} hojas`);
+      toast.success(`PDF listo: ${plural(data.rotulos, "rótulo", "rótulos")} en ${plural(data.hojas, "hoja", "hojas")}`);
       await cargarRotulos();
     } catch (error) {
       toast.error(error.message ?? "No se pudo generar el PDF");
@@ -167,7 +168,7 @@ const CrearAfiches = () => {
               {documento.titulo} está listo
             </div>
             <div className="text-[13.5px] text-neutral-800">
-              {documento.rotulos} rótulos · {documento.hojas} hojas
+              {plural(documento.rotulos, "rótulo", "rótulos")} · {plural(documento.hojas, "hoja", "hojas")}
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -366,7 +367,7 @@ const CrearAfiches = () => {
               <p className="text-[13.5px] text-neutral-700">
                 {totalRotulos === 0
                   ? "Aún no hay rótulos por imprimir"
-                  : `${totalRotulos} rótulos · ${totalHojas} ${totalHojas === 1 ? "hoja" : "hojas"}`}
+                  : `${plural(totalRotulos, "rótulo", "rótulos")} · ${plural(totalHojas, "hoja", "hojas")}`}
               </p>
             </div>
             <button
