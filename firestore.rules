@@ -6,6 +6,13 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == uid;
     }
 
+    // El rol "admin" solo se asigna desde la consola de Firebase (usuarios/{uid}.rol).
+    // La web lo usa para la zona /home/admin.
+    function esAdmin() {
+      return request.auth != null
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('rol', '') == 'admin';
+    }
+
     function texto(valor, maximo) {
       return valor is string && valor.size() <= maximo;
     }
@@ -41,10 +48,17 @@ service cloud.firestore {
         && precioValido(p.precio);
     }
 
+    // El admin puede leer los rotulos de todos (consulta collectionGroup desde la web)
+    match /{ruta=**}/rotulos/{id} {
+      allow read: if esAdmin();
+    }
+
     match /usuarios/{uid} {
-      allow read: if esDueno(uid);
+      allow read: if esDueno(uid) || esAdmin();
+      // nadie puede crearse su perfil con rol: el rol solo lo pone un admin desde la consola
       allow create: if esDueno(uid)
         && request.resource.data.email == request.auth.token.email
+        && !('rol' in request.resource.data)
         && datosDePerfil(request.resource.data);
       allow update: if esDueno(uid)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre', 'apellido', 'nombre_negocio'])
@@ -55,11 +69,17 @@ service cloud.firestore {
         allow create: if esDueno(uid)
           && rotuloValido(request.resource.data)
           && request.resource.data.documento_id == null;
-        // el unico cambio es vincularlo una vez a su documento al generar el PDF
+        // un rotulo pendiente se puede editar (web) o vincular una vez a su documento al generar el PDF
         allow update: if esDueno(uid)
           && resource.data.documento_id == null
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['documento_id'])
-          && request.resource.data.documento_id is string;
+          && (
+            (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['documento_id'])
+              && request.resource.data.documento_id is string)
+            || (rotuloValido(request.resource.data)
+              && request.resource.data.documento_id == null
+              && request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['ean', 'descripcion', 'precio_oferta', 'precio_unitario', 'copias', 'fecha_inicio', 'fecha_fin']))
+          );
         // lo que ya salio en un PDF se conserva para poder volver a descargarlo
         allow delete: if esDueno(uid) && resource.data.documento_id == null;
       }

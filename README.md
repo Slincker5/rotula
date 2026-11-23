@@ -1,18 +1,21 @@
-# Firebase aplicado a React Native en el proyecto Rotula
+# Rotula móvil (React Native + Firebase)
 
-Ariel Alexander Hernandez Merino (carné: HM192562)<br>
-Gerson Vladimir Borja Alvarez (carné: BA251704)
+[![Licencia: CC BY-NC-SA 4.0](https://img.shields.io/badge/Licencia-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE)
+
+Ariel Alexander Hernández Merino (carné: HM251962)<br>
+Gerson Vladimir Borja Álvarez (carné: BA251704)
 
 Universidad Don Bosco<br>
-Desarrollo de Software Multiplataforma<br>
-Ing. Alexander Alberto Siguenza<br>
-8 de noviembre de 2026
+DPS941 Diseño y Programación de Software Multiplataforma<br>
+Ing. Alexander Alberto Siguenza Campos<br>
+Etapa 3: Entrega final · 22 de noviembre de 2026
 
-- Repositorio en GitHub: https://github.com/Slincker5/rotula-movil
-- Video de demostración del Avance 2: **[pega aquí el enlace del video]**
-- Documento de investigación: [docs/Avance2_Firebase_React_Native_APA.pdf](docs/Avance2_Firebase_React_Native_APA.pdf)
-- Video del Avance 1: https://youtu.be/TfKT8T6o_Bg
-- Mockups en Figma: https://www.figma.com/design/TbgoZj5OUNLUFCJI2Mv3hF
+> Esta es la versión móvil de **Rotula**. La entrega final completa (web + móvil) está en el repositorio
+> [Slincker5/rotula](https://github.com/Slincker5/rotula): la web en la raíz y esta app en la carpeta `movil/`.
+
+- Documento de investigación del Avance 2: [docs/Avance2_Firebase_React_Native_APA.pdf](docs/Avance2_Firebase_React_Native_APA.pdf)
+- Documento del Avance 1: [docs/Avance1_React_Native_Figma_APA.pdf](docs/Avance1_React_Native_Figma_APA.pdf)
+- Mockups: ver [Mockups de Figma](#mockups-de-figma) (las imágenes están en `docs/figuras/`)
 
 ---
 
@@ -29,7 +32,9 @@ Ing. Alexander Alberto Siguenza<br>
 9. [Utilidades de fechas](#utilidades-de-fechas)
 10. [Tema y diseño](#tema-y-diseño)
 11. [Base de datos en Firestore](#base-de-datos-en-firestore)
-12. [Trabajo en equipo](#trabajo-en-equipo)
+12. [Mockups de Figma](#mockups-de-figma)
+13. [Trabajo en equipo](#trabajo-en-equipo)
+14. [Licencia](#licencia)
 
 ## Qué es Rotula móvil
 
@@ -37,8 +42,9 @@ Ing. Alexander Alberto Siguenza<br>
 de sus ofertas y los descarguen en un PDF listo para imprimir. Rotula móvil es su versión para Android e iOS.
 
 Desde el Avance 2 la app usa **Firebase**: Authentication para entrar con correo o con Google, y Firestore para
-guardar los datos de cada usuario. La web ([Slincker5/rotula](https://github.com/Slincker5/rotula)) sigue con su
-propia base MySQL, así que **las cuentas y los datos de la web y del celular ya no se comparten**.
+guardar los datos de cada usuario. La web ([Slincker5/rotula](https://github.com/Slincker5/rotula)) usa **el mismo proyecto de Firebase**
+(`rotula-web`) y la misma estructura en Firestore, así que **las cuentas y los datos se comparten**: un rótulo creado
+en el celular aparece en la web y al revés, y se puede entrar con la misma cuenta de correo o de Google.
 
 Avance 2 de Desarrollo de Software Multiplataforma: autenticación con correo y Google, persistencia en Firestore por
 usuario, módulos secundarios (Mis productos y edición de perfil) e historial de los documentos generados.
@@ -322,6 +328,23 @@ dueño de los datos, validan lo que se guarda e impiden cambiar o borrar un rót
 
 Antes del Avance 2, la app usaba la API REST de la web (`/api/login`, `/api/rotulos`, `/api/documentos`), que dejó de usarse.
 
+## Mockups de Figma
+
+Diseño hecho en la Etapa 1 ([archivo de Figma](https://www.figma.com/design/TbgoZj5OUNLUFCJI2Mv3hF)). Las imágenes
+están dentro del repositorio para que se vean sin salir de GitHub.
+
+| Acceso (login y registro) | Crear afiche |
+|---|---|
+| ![Mockups de acceso](docs/figuras/fig_acceso.png) | ![Mockup de crear afiche](docs/figuras/fig_crear.png) |
+
+| Inicio, historial y perfil |
+|---|
+| ![Mockups de inicio, historial y perfil](docs/figuras/fig_principal.png) |
+
+| Componentes | Mockup vs. app terminada |
+|---|---|
+| ![Componentes de Figma](docs/figuras/fig_componentes.png) | ![Comparación mockup y app](docs/figuras/fig_comparacion.png) |
+
 ## Trabajo en equipo
 
 Cada integrante trabajó en su propia rama y la unió a `main` con un Pull Request.
@@ -331,3 +354,12 @@ Cada integrante trabajó en su propia rama y la unió a `main` con un Pull Reque
 | Gerson Vladimir Borja Alvarez | `feature/base-y-acceso` ([PR #1](https://github.com/Slincker5/rotula-movil/pull/1)) | Configuración del proyecto, tema y componentes base, conexión con la API y manejo de sesión, pantallas de login y registro con sus validaciones, pantalla de perfil y navegación |
 | Ariel Alexander Hernandez Merino | `feature/afiches-e-historial` ([PR #2](https://github.com/Slincker5/rotula-movil/pull/2)) | Utilidades de fechas y campo de fecha, validaciones del afiche, descarga de PDF, pantalla para crear afiches con vista previa, historial, pantalla de inicio, pestañas del módulo principal y documento del avance |
 | Ariel Alexander Hernandez Merino | `feature/firebase` | Avance 2: integración de Firebase Authentication y Firestore, generación del PDF en el celular, Mis productos, edición de perfil y documento de investigación |
+
+## Licencia
+
+Este proyecto se publica bajo la licencia **Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional
+(CC BY-NC-SA 4.0)**. Puedes copiarlo y adaptarlo citando a los autores, sin fines comerciales y compartiendo tus cambios
+con la misma licencia. Texto completo en [LICENSE](LICENSE) y resumen en
+https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es.
+
+[![CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
