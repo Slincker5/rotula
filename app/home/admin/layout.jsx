@@ -1,39 +1,30 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import axios from "axios";
 import Cargando from "@/components/loading";
+import { useSesion } from "@/components/Sesion";
 
 const enlaces = [
   { href: "/home/admin", texto: "Rótulos de usuarios", icono: "fa-tags" },
   { href: "/home/admin/productos", texto: "Productos", icono: "fa-box" },
 ];
 
-// todo lo que cuelga de /home/admin pasa por aqui: si la sesion no es admin
-// se regresa a /home. Las rutas de /api/admin validan por su cuenta igual.
+// todo lo que cuelga de /home/admin pasa por aqui: si el perfil de Firestore
+// no tiene rol "admin" se regresa a /home.
 const AdminLayout = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const [verificado, setVerificado] = useState(false);
+  const { usuario } = useSesion();
+  const verificado = usuario?.rol === "admin";
 
-  const verificarAdmin = async () => {
-    try {
-      await axios.get("/api/admin");
-      setVerificado(true);
-    } catch (error) {
-      toast.error(error.response?.data?.error ?? "No autorizado");
+  useEffect(() => {
+    if (usuario && !verificado) {
+      toast.error("No autorizado");
       router.replace("/home");
     }
-  };
-
-  // al entrar reviso el rol una sola vez
-  useEffect(() => {
-    // el setState de verificarAdmin ocurre despues del await, no dentro del efecto
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    verificarAdmin();
-  }, []);
+  }, [usuario, verificado, router]);
 
   if (!verificado) {
     return <Cargando texto="Verificando permisos ..."></Cargando>;
