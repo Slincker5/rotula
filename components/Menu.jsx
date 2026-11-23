@@ -9,6 +9,7 @@ const enlaces = [
   { href: "/home/crear-afiches", texto: "Crear afiches", icono: "fa-circle-plus" },
   { href: "/home/productos", texto: "Mis productos", icono: "fa-box" },
   { href: "/home/historial", texto: "Historial", icono: "fa-clock" },
+  { href: "/home/perfil", texto: "Perfil", icono: "fa-circle-user" },
 ];
 
 // solo se muestra si el perfil de Firestore (usuarios/{uid}) tiene rol "admin"

@@ -1,453 +1,280 @@
-# Rotula — Afiches de ofertas en minutos
+# Rotula — Afiches de ofertas en minutos (web + móvil)
 
-**Universidad Don Bosco · DPS941 Diseño y Programación de Software Multiplataforma**
-**Etapa 2 — Desarrollo base del proyecto (Web)** · Ciclo 02-2026 · Docente: Ing. Alexander Alberto Siguenza Campos
+[![Licencia: CC BY-NC-SA 4.0](https://img.shields.io/badge/Licencia-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![React Native](https://img.shields.io/badge/React%20Native-Expo%20SDK%2058-blue)
+![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-orange)
+
+**Universidad Don Bosco · DPS941 Diseño y Programación de Software Multiplataforma · Grupo G01T**
+**Etapa 3: Entrega final del proyecto multiplataforma** · Ciclo 02-2026 · Docente: Ing. Alexander Alberto Siguenza Campos
 
 | | |
 |---|---|
-| **Repositorio** | https://github.com/Slincker5/rotula |
-| **Despliegue en Vercel** | https://rotula.vercel.app |
-| **Fecha de entrega** | Domingo 20 de septiembre de 2026 |
+| **Repositorio (web + móvil)** | https://github.com/Slincker5/rotula |
+| **Versión web en Vercel** | https://rotula.vercel.app |
+| **Versión móvil** | Carpeta [`movil/`](movil/) de este repositorio (Expo + React Native) |
+| **Fecha de entrega** | Domingo 22 de noviembre de 2026 |
+
+Todo el proyecto está en este repositorio: la web (Next.js) en la raíz y la app móvil (React Native) en `movil/`,
+con su historial de commits completo. Los mockups de Figma, la documentación y la licencia también están aquí.
+
+---
+
+## Contenido
+
+1. [Integrantes](#1-integrantes)
+2. [Descripción del proyecto](#2-descripción-del-proyecto)
+3. [Cumplimiento de la entrega final](#3-cumplimiento-de-la-entrega-final)
+4. [Arquitectura multiplataforma](#4-arquitectura-multiplataforma)
+5. [Stack tecnológico](#5-stack-tecnológico)
+6. [Autenticación](#6-autenticación)
+7. [Módulos](#7-módulos)
+8. [Datos compartidos en Firestore](#8-datos-compartidos-en-firestore)
+9. [Mockups de Figma (Etapa 1)](#9-mockups-de-figma-etapa-1)
+10. [Instalación y ejecución](#10-instalación-y-ejecución)
+11. [Despliegue en Vercel](#11-despliegue-en-vercel)
+12. [Flujo de trabajo con Git](#12-flujo-de-trabajo-con-git)
+13. [Licencia](#13-licencia)
 
 ---
 
 ## 1. Integrantes
 
-| # | Nombre completo | Carnet | Usuario de GitHub | Rama de trabajo | Aporte principal |
+| # | Nombre completo | Carné | Usuario de GitHub | Ramas de trabajo | Aporte principal |
 |---|---|---|---|---|---|
-| 1 | Gerson Vladimir Borja Álvarez | BA251704 | @Slincker5 | `vladi-parte`, `dev` | Backend: API REST, autenticación JWT, generación de PDF |
-| 2 | Ariel Alexander Hernández Merino | HM251962 | @Hernan-byte | `ariel-parte`, `feature/rol-admin-ariel` | Frontend: landing, componentes, módulo de administración |
+| 1 | Gerson Vladimir Borja Álvarez | BA251704 | [@Slincker5](https://github.com/Slincker5) | `vladi-parte`, `dev` (web) · `feature/base-y-acceso` (móvil) | Backend y lógica del PDF, base de la app móvil (tema, componentes, sesión, login, registro, perfil, navegación), development build con Google y migración final de la web a Firestore |
+| 2 | Ariel Alexander Hernández Merino | HM251962 | [@Hernan-byte](https://github.com/Hernan-byte) | `ariel-parte`, `feature/rol-admin-ariel`, `feature/home` (web) · `feature/afiches-e-historial`, `feature/firebase` (móvil) | Frontend web, módulo admin, Firebase Authentication en la web, pantallas de afiches, historial e inicio en el móvil e integración de Firebase en la app |
 
-
-Todos los integrantes están agregados como colaboradores del repositorio. Cada integrante trabaja en su propia rama y la integración se hace por Pull Request hacia `dev` y luego a `main` (ver sección 12).
+Los dos integrantes son colaboradores del repositorio y tienen commits en la web y en la app móvil.
 
 ---
 
 ## 2. Descripción del proyecto
 
-**Rotula** es una aplicación web para dueños y encargados de tiendas, minisúper y supermercados. Permite registrar **rótulos de oferta** (afiches de precio) y generar un **PDF listo para imprimir** con cuatro rótulos por hoja A4, con marcas de corte.
+**Rotula** es una solución multiplataforma para dueños y encargados de tiendas, minisúper y supermercados. Permite
+registrar **rótulos de oferta** (afiches de precio) y generar un **PDF listo para imprimir** con cuatro rótulos por hoja A4,
+con marcas de corte.
 
-Cada rótulo lleva la descripción del producto, el precio de oferta en grande, el precio unitario tachado con el ahorro calculado, la vigencia (fecha de inicio y fin) y el código de barras EAN. El usuario los va agregando a una lista, elige cuántas copias necesita de cada uno y con un clic genera el documento. El dashboard muestra las ofertas activas, las que vencen esta semana, la cuota mensual usada y los últimos documentos generados; el historial permite volver a descargar cualquier PDF.
+Cada rótulo lleva la descripción del producto, el precio de oferta en grande, el precio normal tachado con el ahorro
+calculado, la vigencia (fecha de inicio y fin) y el código de barras EAN. El usuario los agrega a una lista, elige
+cuántas copias necesita y con un clic genera el documento. Puede hacerlo desde la computadora (web) o desde el
+celular (app), con la misma cuenta y los mismos datos.
 
-### Problema que resuelve
+### Problema que resuelve (Etapa 1)
 
-En los comercios pequeños los rótulos de precio se hacen a mano o en Word: sin formato uniforme, sin control de vigencia y sin registro de lo que se imprimió. Rotula centraliza esa información, estandariza el diseño y deja historial.
-
-### Alcance de la Etapa 2
-
-Versión web con la lógica de negocio principal y API REST propia. La Etapa 3 reutilizará esta misma API para la versión móvil en React Native.
+En los comercios pequeños los rótulos de precio se hacen a mano o en Word: sin formato uniforme, sin control de
+vigencia y sin registro de lo que se imprimió. Rotula centraliza esa información, estandariza el diseño y deja historial.
 
 ---
 
-## 3. Stack tecnológico
+## 3. Cumplimiento de la entrega final
 
-| Capa | Tecnología | Versión | Uso en el proyecto |
+| # | Requerimiento | Cómo se cumple | Dónde verlo |
 |---|---|---|---|
-| Framework | **Next.js** (App Router) + **React** | 16.3.4 / 19.2.8 | Frontend y backend (Route Handlers) en un solo proyecto. JavaScript, sin TypeScript |
-| Estilos | **Tailwind CSS** | 4.x | Interfaz responsiva (móvil, tablet, escritorio) |
-| Iconos | **Font Awesome** (kit por CDN) | 6 | Iconografía de toda la interfaz |
-| Cliente HTTP | **Axios** | 1.20 | Consumo de la API REST desde el navegador |
-| Notificaciones | **Sonner** | 2.0 | Toasts de éxito y error en la UI |
-| Autenticación | **JWT** con **jose** + cookie `httpOnly` | jose 6.2 | Sesión firmada con HS256, emitida y verificada en el servidor |
-| Hash de contraseñas | **bcryptjs** / **bcrypt** | 3.0 / 6.0 | Las contraseñas se guardan con hash (12 rondas) |
-| Base de datos | **MySQL** + **mysql2** | mysql2 3.24 | Pool de conexiones; persistencia de usuarios, rótulos, documentos y productos |
-| Generación de PDF | **pdf-lib** | 1.17 | Pinta los rótulos sobre una plantilla PDF (A4, 4 rótulos A6 por hoja) |
-| Compilador | **React Compiler** | 1.0 | Optimización automática de re-renders |
-| Despliegue | **Vercel** | — | Hosting del frontend y de la API (runtime Node.js) |
-| Control de versiones | **Git + GitHub** | — | Ramas por integrante, integración por Pull Request |
+| 1 | Versión web en React + Next.js desplegada en Vercel | Next.js 16 (App Router) + React 19, desplegada en https://rotula.vercel.app | Raíz del repo: `app/`, `components/`, `lib/` |
+| 2 | Versión móvil en React Native con Firebase | Expo SDK 58 + React Native con Firebase JS SDK (Auth + Firestore) | [`movil/`](movil/) |
+| 3 | Autenticación con correo y redes sociales en ambas plataformas | Firebase Authentication: correo/contraseña y **Google** en web (popup) y móvil (Google Sign-In nativo) | Web: `components/Sesion.jsx`, `components/BotonGoogle.jsx` · Móvil: `movil/src/contexto/Sesion.js`, `movil/src/firebase/google.js` |
+| 4 | Módulos principales y secundarios funcionales | Principales: crear afiches, generar PDF, historial e inicio. Secundarios: mis productos, perfil y administración | [Sección 7](#7-módulos) |
+| 5 | Persistencia en Firestore compartida entre web y móvil | Las dos apps usan el **mismo proyecto de Firebase** y la misma estructura `usuarios/{uid}/...` | Web: `lib/rotulos.js`, `lib/productos.js` · Móvil: `movil/src/firebase/` · Reglas: `movil/firestore.rules` |
+| 6 | Diseño UX/UI coherente con los mockups de Figma | Mismos colores, tipografía Figtree, botones en píldora y estructura de pantallas en web y móvil | [Sección 9](#9-mockups-de-figma-etapa-1) |
+| 7 | Mockups publicados en el README | Imágenes de Figma dentro del repositorio (`movil/docs/figuras/`) | [Sección 9](#9-mockups-de-figma-etapa-1) |
+| 8 | Licencia Creative Commons | **CC BY-NC-SA 4.0** | [`LICENSE`](LICENSE), [sección 13](#13-licencia) |
+| 9 | Repositorio GitHub con rama por alumno, colaboradores y README | Ramas por integrante, integración por Pull Request y este README | [Sección 12](#12-flujo-de-trabajo-con-git) |
+| 10 | Propuesta original | Código y diseño propios del grupo | Historial de commits |
 
 ---
 
-## 4. Arquitectura
-
-### 4.1 Separación de capas
+## 4. Arquitectura multiplataforma
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│  CAPA DE PRESENTACIÓN (UI)                                           │
-│  app/**/page.jsx · app/**/layout.jsx · components/                   │
-│  Componentes de React ("use client"). Renderizan, capturan eventos   │
-│  y llaman a la API con Axios. Nunca tocan la base de datos.          │
-├──────────────────────────────────────────────────────────────────────┤
-│  CAPA DE LÓGICA DE NEGOCIO                                           │
-│  lib/validarRotuloInput.js · lib/validarProductoInput.js             │
-│  lib/generarRotulos.js · lib/pintarRotulo.js                         │
-│  lib/auth.js · lib/admin.js · proxy.js                               │
-│  Reglas de validación, generación del PDF, sesión y permisos.        │
-│  Funciones puras: no saben de HTTP ni de la UI.                      │
-├──────────────────────────────────────────────────────────────────────┤
-│  CAPA DE DATOS                                                       │
-│  app/api/**/route.js · lib/db.js (pool MySQL)                        │
-│  Endpoints REST: reciben la petición, validan con la capa de lógica, │
-│  consultan MySQL y responden JSON. Único acceso a la base de datos.  │
-└──────────────────────────────────────────────────────────────────────┘
+                ┌──────────────────────────┐         ┌──────────────────────────┐
+                │  WEB  (raíz del repo)    │         │  MÓVIL  (movil/)         │
+                │  Next.js 16 + React 19   │         │  Expo + React Native     │
+                │  Tailwind CSS · Vercel   │         │  React Navigation        │
+                │  pdf-lib en el navegador │         │  pdf-lib en el celular   │
+                └────────────┬─────────────┘         └────────────┬─────────────┘
+                             │   Firebase JS SDK (mismo proyecto)  │
+                             └───────────────┬─────────────────────┘
+                                             ▼
+                        ┌─────────────────────────────────────────────┐
+                        │  FIREBASE (proyecto rotula-web)             │
+                        │  Authentication: correo + Google            │
+                        │  Firestore: usuarios/{uid}/rotulos          │
+                        │             usuarios/{uid}/documentos       │
+                        │             usuarios/{uid}/productos        │
+                        │  Reglas de seguridad: movil/firestore.rules │
+                        └─────────────────────────────────────────────┘
 ```
 
-- **UI**: cada página mantiene su estado local con `useState`/`useEffect` y consume la API con Axios. Los componentes compartidos (`Menu`, `Footer`, `Cargando`) viven en `components/`.
-- **Lógica**: las validaciones y la generación del PDF están aisladas en `lib/`, de modo que los mismos validadores se reutilizan en crear y editar, y el mismo generador se usa al crear un documento y al volver a descargarlo.
-- **Datos**: los Route Handlers de `app/api/` son el único lugar que ejecuta SQL, siempre con consultas parametrizadas (`?`) para evitar inyección SQL.
+- **Sin servidor propio:** las dos apps hablan directo con Firebase. La seguridad la ponen las reglas de Firestore
+  (cada usuario solo lee y escribe lo suyo, y se validan los datos).
+- **El PDF no se guarda en ningún lado:** se pinta con `pdf-lib` en el navegador o en el celular a partir de los rótulos
+  guardados. Por eso un documento se puede volver a descargar desde cualquiera de las dos plataformas.
+- **Mismo código de negocio:** el generador del PDF (`lib/pdf/` en la web y `movil/src/pdf/` en el móvil) y las
+  validaciones son los mismos en las dos apps.
 
-### 4.2 Estructura de carpetas
+### Estructura del repositorio
 
 ```
 rotula/
-├── app/
-│   ├── layout.js                     # Layout raíz: Menu, Footer, Toaster, Font Awesome
-│   ├── page.js                       # Landing pública
-│   ├── login/page.jsx                # Inicio de sesión
-│   ├── registro/page.jsx             # Registro de usuario
-│   ├── home/                         # Zona privada (requiere sesión)
-│   │   ├── page.jsx                  # Dashboard
-│   │   ├── crear-afiches/page.jsx    # CRUD de rótulos + generar PDF
-│   │   ├── historial/page.jsx        # Documentos generados
-│   │   └── admin/                    # Zona de administrador (requiere rol admin)
-│   │       ├── layout.jsx            # Verifica el rol antes de mostrar
-│   │       ├── page.jsx              # Rótulos de todos los usuarios
-│   │       └── productos/page.jsx    # CRUD del catálogo de productos
-│   └── api/                          # API REST
-│       ├── registro/route.js
-│       ├── login/route.js
-│       ├── logout/route.js
-│       ├── usuario/route.js
-│       ├── rotulos/route.js          # GET listar · POST crear
-│       ├── rotulos/[id]/route.js     # GET · PUT · DELETE
-│       ├── rotulos/pdf/route.js      # POST generar documento
-│       ├── documentos/route.js       # GET historial
-│       ├── documentos/[uuid]/pdf/route.js   # GET descargar PDF
-│       └── admin/
-│           ├── route.js              # GET verificar rol admin
-│           ├── rotulos/route.js      # GET rótulos de todos los usuarios
-│           ├── productos/route.js    # GET · POST
-│           └── productos/[id]/route.js      # PUT · DELETE
-├── components/
-│   ├── Menu.jsx                      # Navegación; muestra "Admin" solo si el rol lo permite
-│   ├── Footer.jsx
-│   └── loading.jsx                   # Indicador de carga
+├── app/                        # WEB (Next.js App Router)
+│   ├── page.js                 # Landing pública
+│   ├── login/ · registro/      # Acceso con correo o Google
+│   └── home/                   # Zona privada (requiere sesión)
+│       ├── page.jsx            # Inicio: resumen de ofertas y últimos PDF
+│       ├── crear-afiches/      # Crear, editar y quitar rótulos; generar el PDF
+│       ├── productos/          # Mis productos (catálogo del negocio)
+│       ├── historial/          # Todos los PDF generados
+│       ├── perfil/             # Ver y editar la cuenta
+│       └── admin/              # Rótulos de todos los usuarios (solo rol admin)
+├── components/                 # Menu, Sesion (contexto), GuardSesion, BotonGoogle, BotonPdf...
 ├── lib/
-│   ├── db.js                         # Pool de conexiones MySQL (mysql2/promise)
-│   ├── auth.js                       # getSession() / getUser() a partir de la cookie
-│   ├── admin.js                      # getAdmin(): usuario solo si rol === 'admin'
-│   ├── validarRotuloInput.js         # Reglas de validación de rótulos
-│   ├── validarProductoInput.js       # Reglas de validación de productos
-│   ├── generarRotulos.js             # Arma el PDF: hojas, celdas, marcas de corte
-│   └── pintarRotulo.js               # Dibuja un rótulo (textos, precios, EAN)
-├── plantillas/
-│   ├── plantilla-rotulo.pdf          # Plantilla base del rótulo
-│   └── plantilla-rotulo.svg
-├── proxy.js                          # Middleware de rutas (en Next 16 se llama proxy)
-├── next.config.mjs                   # reactCompiler + inclusión de plantillas en Vercel
-├── .env.local                        # Variables de entorno (no se sube al repo)
-└── package.json
+│   ├── firebase.js             # Conexión con el proyecto de Firebase
+│   ├── usuarios.js             # Perfil usuarios/{uid}
+│   ├── rotulos.js              # Rótulos y documentos en Firestore + generar PDF
+│   ├── productos.js            # Mis productos en Firestore
+│   ├── admin.js                # Consulta de admin (collectionGroup)
+│   ├── pdf/                    # Generador del PDF (mismo que el móvil)
+│   ├── validarRotuloInput.js   # Reglas de validación de rótulos
+│   ├── validarProductoInput.js # Reglas de validación de productos
+│   ├── fechas.js · errores.js  # Fechas en hora local y errores de Firebase en español
+├── movil/                      # MÓVIL (Expo + React Native) — ver movil/README.md
+│   ├── src/pantallas/          # Login, Registro, Inicio, CrearAfiche, Productos, Historial, Perfil
+│   ├── src/firebase/           # Auth, Firestore, Google
+│   ├── src/pdf/                # Generador del PDF
+│   ├── firestore.rules         # Reglas de seguridad compartidas por web y móvil
+│   └── docs/                   # Documentos de avances y figuras de Figma
+├── plantillas/                 # Diseño original del rótulo (SVG y PDF)
+└── LICENSE                     # CC BY-NC-SA 4.0
 ```
 
 ---
 
-## 5. Autenticación y roles
+## 5. Stack tecnológico
 
-### 5.1 Flujo de sesión (JWT en cookie httpOnly)
-
-1. `POST /api/registro`: valida los campos, hace hash de la contraseña con bcrypt (12 rondas) y crea el usuario con rol `user`.
-2. `POST /api/login`: busca el usuario por correo, compara la contraseña con `bcrypt.compare` y, si es válida, firma un **JWT (HS256)** con `jose` que lleva el `id` del usuario en `sub`, con vigencia de 7 días.
-3. El token viaja en la cookie **`sesion`** con `httpOnly: true`, `secure` en producción, `sameSite: lax` y `path: /`. **El token nunca es accesible desde JavaScript del navegador**, lo que evita su robo por XSS.
-4. En cada petición el navegador envía la cookie automáticamente. Los endpoints protegidos llaman a `getSession()` / `getUser()` (`lib/auth.js`), que verifican la firma y la expiración; si falla responden `401`.
-5. `proxy.js` (middleware) revisa la cookie antes de servir las páginas: sin sesión, `/home/*` redirige a `/login`; con sesión, `/login` y `/registro` redirigen a `/home`.
-6. `POST /api/logout` elimina la cookie.
-
-### 5.2 Roles y permisos
-
-Existen dos roles guardados en `usuarios.rol`: **`user`** (por defecto al registrarse) y **`admin`**.
-
-| Acción | `user` | `admin` |
+| Capa | Web | Móvil |
 |---|---|---|
-| Registrarse, iniciar y cerrar sesión | Sí | Sí |
-| Ver dashboard e historial propios | Sí | Sí |
-| Crear, listar, editar y borrar **sus propios** rótulos | Sí | Sí |
-| Generar y volver a descargar **sus propios** PDF | Sí | Sí |
-| Ver los rótulos de **todos** los usuarios (`/home/admin`) | No | Sí |
-| Administrar el catálogo de productos: crear, listar, editar, borrar (`/home/admin/productos`) | No | Sí |
-| Consumir `/api/admin/**` | No (`403`) | Sí |
-
-- **Backend**: `lib/admin.js` → `getAdmin()` devuelve el usuario solo si `rol === 'admin'`; todos los endpoints de `/api/admin/**` lo usan y responden `403 Forbidden` a cualquier otro rol.
-- **Frontend**: `components/Menu.jsx` muestra el enlace "Admin" solo si `GET /api/admin` responde `ok`; `app/home/admin/layout.jsx` vuelve a verificar y, si no es admin, regresa a `/home` con un aviso. **La validación real siempre ocurre en el servidor**; lo del cliente es solo experiencia de usuario.
-- Un usuario nunca puede leer, editar ni borrar rótulos o documentos de otro: todas las consultas filtran por `usuario_id` de la sesión.
+| Framework | Next.js 16.3 (App Router) + React 19.2 | Expo SDK 58 + React Native 0.88 + React 19.3 |
+| Interfaz | Tailwind CSS 4, Font Awesome, Sonner (toasts) | StyleSheet + `src/tema.js`, Ionicons, fuente Figtree |
+| Navegación | Rutas de App Router | React Navigation 7 (stack + pestañas) |
+| Autenticación | Firebase Authentication (correo, Google con popup) | Firebase Authentication (correo, Google Sign-In nativo) |
+| Base de datos | Cloud Firestore | Cloud Firestore (mismo proyecto) |
+| PDF | pdf-lib en el navegador | pdf-lib + expo-file-system + expo-sharing |
+| Despliegue | Vercel | Expo Go / development build con EAS |
+| Lenguaje | JavaScript | JavaScript |
 
 ---
 
-## 6. API REST
+## 6. Autenticación
 
-Base URL local: `http://localhost:3000/api` · Producción: `https://[COMPLETAR].vercel.app/api`
+Las dos plataformas usan **Firebase Authentication** del mismo proyecto, así que una cuenta creada en la web sirve en el
+celular y al revés.
 
-Todas las respuestas son JSON. Los endpoints con **Sesión = Sí** requieren la cookie `sesion`; los de **Admin** requieren además rol `admin`.
+| Método | Web | Móvil |
+|---|---|---|
+| Correo y contraseña (registro e inicio de sesión) | `createUserWithEmailAndPassword` / `signInWithEmailAndPassword` | Igual |
+| Google (red social) | `signInWithPopup` con `GoogleAuthProvider` | `@react-native-google-signin` + `signInWithCredential` (development build) |
+| Sesión persistente | La guarda Firebase en el navegador | AsyncStorage |
+| Rutas protegidas | `components/GuardSesion.jsx` envuelve `/home/*` | El stack solo muestra las pestañas si hay sesión |
+| Rol de administrador | `usuarios/{uid}.rol == "admin"` habilita `/home/admin` | — |
 
-### 6.1 Autenticación y usuario
+Al entrar por primera vez (desde cualquiera de las dos apps) se crea el perfil `usuarios/{uid}` con nombre, apellido,
+negocio y correo. Los errores de Firebase se muestran en español con los mismos mensajes en web y móvil.
 
-| Método | Endpoint | Sesión | Descripción | Body |
+---
+
+## 7. Módulos
+
+| Módulo | Tipo | Web | Móvil | Qué hace |
 |---|---|---|---|---|
-| `POST` | `/api/registro` | No | Crea un usuario con rol `user` | `{ nombre, apellido, email, nombre_negocio, password_hash }` |
-| `POST` | `/api/login` | No | Valida credenciales y envía la cookie `sesion` | `{ email, password }` |
-| `POST` | `/api/logout` | Sí | Elimina la cookie | — |
-| `GET` | `/api/usuario` | Sí | Datos del usuario autenticado | — |
+| Acceso | Principal | `/login`, `/registro` | Login, Registro | Registro, inicio de sesión con correo o Google, validaciones |
+| Crear afiches | Principal | `/home/crear-afiches` | Crear | Formulario del rótulo (con producto guardado opcional), lista de pendientes, editar y quitar |
+| Generar PDF | Principal | Botón "Generar PDF" | Botón "Generar PDF" | Expande copias, 4 rótulos por hoja A4 con marcas de corte, registra el documento y marca los rótulos como impresos en un solo lote |
+| Historial | Principal | `/home/historial` | Historial | Lista de PDF generados; cada uno se vuelve a pintar y descargar |
+| Inicio | Principal | `/home` | Inicio | Ofertas activas, ofertas que vencen en 7 días, rótulos usados en el mes y últimos 3 PDF |
+| Mis productos | Secundario | `/home/productos` | Productos | Catálogo del negocio: crear, listar, editar, borrar y usarlo al crear un afiche |
+| Perfil | Secundario | `/home/perfil` | Perfil | Datos de la cuenta, edición de nombre y negocio, cerrar sesión |
+| Administración | Secundario | `/home/admin` | — | Rótulos de todos los usuarios (web y móvil) con buscador; solo para rol admin |
 
-### 6.2 Rótulos (módulo de gestión principal — CRUD)
+### Validaciones
 
-| Método | Endpoint | Sesión | Descripción |
-|---|---|---|---|
-| `GET` | `/api/rotulos` | Sí | Lista los rótulos del usuario, más recientes primero |
-| `POST` | `/api/rotulos` | Sí | Crea un rótulo (`201`) |
-| `GET` | `/api/rotulos/:id` | Sí | Obtiene un rótulo propio |
-| `PUT` | `/api/rotulos/:id` | Sí | Actualiza un rótulo propio |
-| `DELETE` | `/api/rotulos/:id` | Sí | Elimina un rótulo propio |
+- **Rótulo:** código de barras solo números (máx. 14), descripción obligatoria (máx. 120), precios con formato `1.99`
+  mayores a 0, copias enteras mayores a 0 y fecha fin igual o posterior a la de inicio.
+- **Producto:** descripción obligatoria, precio válido mayor a 0, código de barras opcional (solo números).
+- Se validan en la app (`lib/validar*.js` en la web, `movil/src/utilidades/validaciones.js` en el móvil) y **otra vez en
+  el servidor** con las reglas de Firestore.
 
-Body de creación / edición:
+---
 
-```json
-{
-  "ean": "7401005904011",
-  "descripcion": "Arroz blanco 5 lb",
-  "precio_oferta": "1.99",
-  "precio_unitario": "2.50",
-  "copias": "4",
-  "fecha_inicio": "2026-09-21",
-  "fecha_fin": "2026-09-28"
-}
-```
+## 8. Datos compartidos en Firestore
 
-### 6.3 Documentos (lógica de negocio central)
-
-| Método | Endpoint | Sesión | Descripción |
-|---|---|---|---|
-| `POST` | `/api/rotulos/pdf` | Sí | Toma todos los rótulos **pendientes** del usuario (`documento_id IS NULL`), genera el PDF, registra el documento y marca esos rótulos como impresos. Responde `{ url, uuid, documento_id, titulo, rotulos, hojas }` |
-| `GET` | `/api/documentos` | Sí | Historial de documentos del usuario |
-| `GET` | `/api/documentos/:uuid/pdf` | Sí | Devuelve el PDF (`application/pdf`). Se vuelve a pintar con los mismos rótulos, así no se guarda ningún archivo en disco (Vercel es de solo lectura) |
-
-### 6.4 Administración
-
-| Método | Endpoint | Admin | Descripción |
-|---|---|---|---|
-| `GET` | `/api/admin` | Sí | Confirma que la sesión es de administrador (`403` si no) |
-| `GET` | `/api/admin/rotulos` | Sí | Rótulos de todos los usuarios con nombre, correo y negocio de quien los creó |
-| `GET` | `/api/admin/productos` | Sí | Catálogo de productos |
-| `POST` | `/api/admin/productos` | Sí | Crea un producto |
-| `PUT` | `/api/admin/productos/:id` | Sí | Actualiza un producto |
-| `DELETE` | `/api/admin/productos/:id` | Sí | Elimina un producto |
-
-Body de producto: `{ ean, descripcion, precio, imagen }` (`ean` e `imagen` opcionales).
-
-### 6.5 Códigos de respuesta y formato de error
-
-| Código | Cuándo |
+| Ruta | Campos |
 |---|---|
-| `200` / `201` | Operación correcta / recurso creado |
-| `400` | Body inválido o falla de validación: `{ ok: false, error: "mensaje" }` |
-| `401` | Sin sesión o token inválido/vencido |
-| `403` | Sesión válida pero sin rol `admin` |
-| `404` | El rótulo, documento o producto no existe o no pertenece al usuario |
-| `409` | Correo ya registrado |
-| `500` | Error interno; se registra en el servidor y se responde un mensaje genérico |
+| `usuarios/{uid}` | `nombre`, `apellido`, `nombre_negocio`, `email`, `proveedor`, `fecha_registro`, `rol` (solo admin, desde la consola) |
+| `usuarios/{uid}/rotulos/{id}` | `ean`, `descripcion`, `precio_oferta`, `precio_unitario`, `copias`, `fecha_inicio`, `fecha_fin`, `documento_id`, `fecha_creacion` |
+| `usuarios/{uid}/documentos/{id}` | `titulo`, `rotulos_por_hoja`, `total_rotulos`, `fecha_creacion` |
+| `usuarios/{uid}/productos/{id}` | `ean`, `descripcion`, `precio`, `imagen` (opcional), `fecha_creacion` |
 
-Todos los endpoints envuelven el acceso a datos en `try/catch`. En el frontend, Axios lanza excepción en cualquier `4xx/5xx` y la página muestra el mensaje con un toast.
+- Un rótulo con `documento_id == null` está **pendiente** de imprimir. Al generar el PDF se crea el documento y se
+  vinculan sus rótulos en una sola escritura en lote (`writeBatch`): o se guarda todo o nada.
+- Las fechas de vigencia se guardan como texto `AAAA-MM-DD` y se leen en hora local en las dos apps.
 
----
+### Reglas de seguridad (`movil/firestore.rules`)
 
-## 7. Validación de entradas
+- Cada usuario solo puede leer y escribir dentro de `usuarios/{su uid}`.
+- Se valida el tipo y el largo de cada campo (precios numéricos mayores a 0, copias enteras, fecha fin ≥ fecha inicio).
+- Un rótulo que ya salió en un PDF no se puede editar ni borrar, para poder volver a descargar el documento.
+- Nadie puede asignarse el rol `admin`; el admin puede leer los rótulos de todos (`collectionGroup`) y los perfiles.
 
-**Backend** (`lib/validarRotuloInput.js`, `lib/validarProductoInput.js`, `api/registro`, `api/login`):
-
-- Campos requeridos: EAN, descripción, precio de oferta, precio unitario, copias, fecha inicio y fecha fin.
-- EAN y copias: solo dígitos; EAN máximo 14 dígitos.
-- Precios: formato `123` o `123.45`, mayores que 0.
-- Copias: mayor que 0.
-- Fecha fin no puede ser anterior a fecha inicio.
-- Descripción máximo 120 caracteres; se normaliza a mayúsculas.
-- Correo con formato válido; contraseña mínimo 8 caracteres; correo único (`409`).
-- Toda consulta SQL es parametrizada.
-
-**Frontend**: campos `required` y tipos (`number`, `date`, `email`) en los formularios, confirmación de contraseña en el registro, y mensajes de error de la API mostrados con Sonner.
+Para convertir una cuenta en administrador: Firebase Console → Firestore → `usuarios/{uid}` → agregar el campo
+`rol` = `"admin"`.
 
 ---
 
-## 8. Generación del PDF (lógica de negocio)
+## 9. Mockups de Figma (Etapa 1)
 
-1. `POST /api/rotulos/pdf` consulta los rótulos pendientes del usuario.
-2. `lib/generarRotulos.js` **expande** cada rótulo según sus `copias` (8 copias = 8 rótulos = 2 hojas), abre `plantillas/plantilla-rotulo.pdf` con **pdf-lib** y coloca 4 rótulos A6 por hoja A4 (2 × 2) con marcas de corte.
-3. `lib/pintarRotulo.js` dibuja cada rótulo: descripción (ajusta el tamaño de letra para que quepa), precio de oferta en grande, precio anterior tachado y ahorro calculado, vigencia y código EAN.
-4. Se registra el documento en la tabla `documentos` con un `uuid`, se marcan los rótulos con `documento_id` y se responde el enlace `/api/documentos/{uuid}/pdf`.
-5. El PDF no se guarda en disco: al descargarlo se vuelve a generar con los mismos rótulos. Esto permite funcionar en Vercel, donde el sistema de archivos es de solo lectura. `next.config.mjs` incluye la carpeta `plantillas/` en las funciones serverless (`outputFileTracingIncludes`).
+Diseño hecho en Figma en la Etapa 1: 8 pantallas, componentes y variables de color
+([archivo original](https://www.figma.com/design/TbgoZj5OUNLUFCJI2Mv3hF)). Las imágenes están guardadas dentro del
+repositorio. La web usa la misma paleta (`#E2502A` de acento, `#111111` de texto, grises `#F7F7F5` / `#F2F2F0`),
+la fuente Figtree y los botones en forma de píldora.
 
----
+### Acceso: login y registro
+![Mockups de login y registro](movil/docs/figuras/fig_acceso.png)
 
-## 9. Modelo de datos (MySQL)
+### Inicio, historial y perfil
+![Mockups de inicio, historial y perfil](movil/docs/figuras/fig_principal.png)
 
-```
-usuarios                          rotulos                              documentos
-────────────────────────          ─────────────────────────────        ─────────────────────────
-id            INT PK AI           id              INT PK AI            id               INT PK AI
-nombre        VARCHAR             usuario_id      INT FK → usuarios    uuid             CHAR(36) UNIQUE
-apellido      VARCHAR             documento_id    INT FK → documentos  usuario_id       INT FK → usuarios
-email         VARCHAR UNIQUE                      (NULL = pendiente)   titulo           VARCHAR
-password_hash VARCHAR             ean             VARCHAR(14)          rotulos_por_hoja INT
-nombre_negocio VARCHAR            descripcion     VARCHAR(120)         total_rotulos    INT
-rol           ENUM('admin','user') precio_oferta  DECIMAL(10,2)        url_pdf          VARCHAR
-                                  precio_unitario DECIMAL(10,2)        fecha_creacion   DATETIME
-productos                         copias          INT
-────────────────────────          fecha_inicio    DATE
-id            INT PK AI           fecha_fin       DATE
-usuario_id    INT FK → usuarios   fecha_creacion  DATETIME
-ean           VARCHAR(14) NULL
-descripcion   VARCHAR(120)
-precio        DECIMAL(10,2)
-imagen        VARCHAR(255) NULL
-fecha_creacion DATETIME
-```
+### Crear afiche
+![Mockup de crear afiche](movil/docs/figuras/fig_crear.png)
 
-Relaciones:
+### Componentes del sistema de diseño
+![Componentes de Figma](movil/docs/figuras/fig_componentes.png)
 
-- Un **usuario** tiene muchos **rótulos**, muchos **documentos** y (si es admin) muchos **productos**.
-- Un **documento** agrupa muchos **rótulos**. Un rótulo con `documento_id = NULL` está pendiente de imprimir; al generar el PDF se vincula al documento.
-- **productos** es el catálogo que administra el rol admin.
-
-Script de creación:
-
-```sql
-CREATE TABLE usuarios (
-  id             INT AUTO_INCREMENT PRIMARY KEY,
-  nombre         VARCHAR(60)  NOT NULL,
-  apellido       VARCHAR(60),
-  email          VARCHAR(120) NOT NULL UNIQUE,
-  password_hash  VARCHAR(255) NOT NULL,
-  nombre_negocio VARCHAR(120),
-  rol            ENUM('admin','user') NOT NULL DEFAULT 'user',
-  fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE documentos (
-  id               INT AUTO_INCREMENT PRIMARY KEY,
-  uuid             CHAR(36) NOT NULL UNIQUE,
-  usuario_id       INT NOT NULL,
-  titulo           VARCHAR(120),
-  rotulos_por_hoja INT NOT NULL DEFAULT 4,
-  total_rotulos    INT NOT NULL,
-  url_pdf          VARCHAR(255),
-  fecha_creacion   DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
-
-CREATE TABLE rotulos (
-  id              INT AUTO_INCREMENT PRIMARY KEY,
-  usuario_id      INT NOT NULL,
-  documento_id    INT NULL,
-  ean             VARCHAR(14)  NOT NULL,
-  descripcion     VARCHAR(120) NOT NULL,
-  precio_oferta   DECIMAL(10,2) NOT NULL,
-  precio_unitario DECIMAL(10,2) NOT NULL,
-  copias          INT NOT NULL DEFAULT 1,
-  fecha_inicio    DATE NOT NULL,
-  fecha_fin       DATE NOT NULL,
-  fecha_creacion  DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (usuario_id)   REFERENCES usuarios(id),
-  FOREIGN KEY (documento_id) REFERENCES documentos(id)
-);
-
-CREATE TABLE productos (
-  id             INT AUTO_INCREMENT PRIMARY KEY,
-  usuario_id     INT NOT NULL,
-  ean            VARCHAR(14),
-  descripcion    VARCHAR(120) NOT NULL,
-  precio         DECIMAL(10,2) NOT NULL,
-  imagen         VARCHAR(255),
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
-```
-
-> **[VERIFICAR]** Este script está reconstruido a partir de las consultas del código. Para dejar el esquema exacto: `mysqldump -h HOST -u USUARIO -p --no-data rotula > database/schema.sql` y reemplazar este bloque.
+### Mockup vs. app terminada
+![Comparación entre el mockup de Figma y la app](movil/docs/figuras/fig_comparacion.png)
 
 ---
 
-## 10. Cumplimiento de los requerimientos
+## 10. Instalación y ejecución
 
-### Requerimientos funcionales mínimos
-
-| # | Requerimiento | Implementación | Dónde verlo |
-|---|---|---|---|
-| 1 | Autenticación (registro, login, rutas protegidas por rol) | Registro y login con JWT en cookie httpOnly; `proxy.js` protege `/home/*`; zona `/home/admin` y `/api/admin/**` solo para rol `admin` | `/registro`, `/login`, `proxy.js`, `lib/auth.js`, `lib/admin.js` |
-| 2 | Gestión principal (crear, listar, actualizar, eliminar) | CRUD de rótulos por usuario y CRUD de productos por admin | `/home/crear-afiches`, `/home/admin/productos`, `app/api/rotulos/**`, `app/api/admin/productos/**` |
-| 3 | Lógica de negocio central | Generación del PDF con pdf-lib: expansión por copias, 4 por hoja, marcas de corte, cálculo de ahorro, registro del documento y vinculación de rótulos | `lib/generarRotulos.js`, `lib/pintarRotulo.js`, `app/api/rotulos/pdf/route.js` |
-| 4 | Dashboard / vista resumen | Ofertas activas, ofertas que vencen esta semana, rótulos usados del mes, últimos 3 documentos | `/home` |
-| 5 | Actualización dinámica de datos | Tras crear, editar, borrar o generar el PDF, la lista se vuelve a cargar desde la API y la UI se actualiza sin recargar la página | `app/home/crear-afiches/page.jsx` (`cargarRotulos()`) |
-
-### Requerimientos técnicos
-
-| Requerimiento | Cumplimiento |
-|---|---|
-| React + Next.js | Next.js 16 App Router + React 19 |
-| Separación de capas UI / lógica / datos | UI en `app/` y `components/`, lógica en `lib/`, datos en `app/api/` + `lib/db.js` (sección 4) |
-| Módulos de la propuesta de Etapa 1 | Autenticación, rótulos, generación de documentos, historial, dashboard, administración |
-| Integración con API REST | Backend propio con Route Handlers de Next.js y MySQL |
-| Interfaz responsiva | Tailwind CSS 4 con breakpoints `sm / lg` en todas las vistas |
-| Autenticación con registro, login y rutas protegidas | JWT + cookie httpOnly + `proxy.js` |
-| Mínimo 2 roles con permisos diferenciados | `user` y `admin` (sección 5.2) |
-| Validación de entradas y manejo de errores | Sección 7 y 6.5 |
-| Repositorio GitHub, rama por alumno, colaboradores | Sección 1 y 12 |
-| Despliegue en Vercel con enlace público | Encabezado |
-
----
-
-## 11. Instalación y ejecución local
-
-### Requisitos
-
-- Node.js 20 o superior (desarrollado con Node 22)
-- MySQL 8 (local o remoto)
-- Git
-
-### Pasos
+Requisitos: Node.js 20 o superior y Git.
 
 ```bash
-# 1. Clonar
 git clone https://github.com/Slincker5/rotula.git
 cd rotula
-
-# 2. Dependencias
-npm install
-
-# 3. Base de datos: ejecutar el script de la sección 9 en MySQL
-#    y crear al menos un usuario con rol 'admin' (o cambiarlo con UPDATE)
-
-# 4. Variables de entorno
-#    Crear .env.local en la raíz con el contenido de abajo
-
-# 5. Correr
-npm run dev
-# http://localhost:3000
 ```
 
-### Variables de entorno (`.env.local`)
+### Web (raíz)
 
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=rotula
-DB_PASSWORD=tu_password
-DB_NAME=rotula
-JWT_SECRET=una_cadena_larga_y_aleatoria_de_al_menos_32_caracteres
+```bash
+npm install
+cp .env.example .env.local   # pegar la configuración web del proyecto de Firebase
+npm run dev                  # http://localhost:3000
 ```
 
 | Variable | Descripción |
 |---|---|
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Conexión a MySQL (pool de 10 conexiones) |
-| `JWT_SECRET` | Clave con la que se firman y verifican los tokens |
-
-### Usuarios de prueba
-
-| Rol | Correo | Contraseña |
-|---|---|---|
-| Administrador | **[COMPLETAR]** | **[COMPLETAR]** |
-| Usuario | **[COMPLETAR]** | **[COMPLETAR]** |
-
-Para convertir un usuario en administrador: `UPDATE usuarios SET rol = 'admin' WHERE email = 'correo@ejemplo.com';`
-
-### Scripts
+| `NEXT_PUBLIC_FIREBASE_API_KEY`, `..._AUTH_DOMAIN`, `..._PROJECT_ID`, `..._STORAGE_BUCKET`, `..._MESSAGING_SENDER_ID`, `..._APP_ID` | Configuración de la app web de Firebase (Configuración del proyecto → Tus apps) |
 
 | Comando | Acción |
 |---|---|
@@ -456,26 +283,47 @@ Para convertir un usuario en administrador: `UPDATE usuarios SET rol = 'admin' W
 | `npm start` | Servir la compilación |
 | `npm run lint` | ESLint |
 
+### Móvil (`movil/`)
+
+```bash
+cd movil
+npm install
+cp .env.example .env.local   # mismos datos de Firebase con prefijo EXPO_PUBLIC_
+npx expo start --go          # Expo Go (correo y contraseña)
+```
+
+Para entrar con Google hace falta el development build (`npx eas-cli build --profile development --platform android`).
+Los pasos completos están en [movil/README.md](movil/README.md#cómo-correr-la-app).
+
+### Reglas de Firestore
+
+Si cambian, se publican desde Firebase Console → Firestore → Reglas, copiando `movil/firestore.rules`
+(o con `firebase deploy --only firestore:rules` dentro de `movil/`).
+
 ---
 
-## 12. Despliegue en Vercel
+## 11. Despliegue en Vercel
 
-1. Importar el repositorio en https://vercel.com/new (detecta Next.js automáticamente).
-2. En **Settings → Environment Variables** cargar las mismas variables de `.env.local`, apuntando a una base de datos MySQL accesible desde internet.
-3. Deploy. Cada push a `main` genera un despliegue automático.
-4. Las rutas que generan PDF declaran `runtime = "nodejs"` y `next.config.mjs` incluye `plantillas/**` en el empaquetado de las funciones para que la plantilla exista en el servidor.
+1. Importar el repositorio en https://vercel.com/new (detecta Next.js en la raíz).
+2. En **Settings → Environment Variables** cargar las variables `NEXT_PUBLIC_FIREBASE_*`.
+3. En Firebase Console → Authentication → Configuración → **Dominios autorizados**, agregar `rotula.vercel.app`
+   para que funcione el inicio de sesión con Google.
+4. Cada push a `main` genera un despliegue automático.
 
-URL pública: https://**[COMPLETAR]**.vercel.app
+URL pública: https://rotula.vercel.app
 
 ---
 
-## 13. Flujo de trabajo con Git
+## 12. Flujo de trabajo con Git
 
 - `main`: rama estable; es la que despliega Vercel.
-- `dev`: rama de integración donde se prueban los cambios de todos antes de pasar a `main`.
-- Ramas por integrante: `vladi-parte`, `ariel-parte`, `feature/home`, `feature/rol-admin-ariel`, **[COMPLETAR otras]**.
-- Integración por **Pull Request** (13 PR al momento de la entrega), revisado por otro integrante.
-- Convención de commits: `frontend: ...` / `backend: ...` seguido de la descripción.
+- `dev`: rama de integración de la web.
+- Ramas por integrante (web): `vladi-parte` (Gerson), `ariel-parte` y `feature/rol-admin-ariel` (Ariel), `feature/home`.
+- Ramas por integrante (móvil, desarrolladas en [Slincker5/rotula-movil](https://github.com/Slincker5/rotula-movil)):
+  `feature/base-y-acceso` (Gerson), `feature/afiches-e-historial` y `feature/firebase` (Ariel). Para la entrega final
+  la app se unió en `movil/` con `git subtree`, así se conservan todos los commits de los dos integrantes.
+- Integración por **Pull Request** hacia `dev` y luego a `main`.
+- Convención de commits: `frontend: ...` / `backend: ...` o una descripción en español de lo que se hizo.
 
 ```bash
 git checkout -b feature/tu-nombre
@@ -485,13 +333,19 @@ git push -u origin feature/tu-nombre
 # Abrir Pull Request hacia dev
 ```
 
-
-## 14. Próximos pasos (Etapa 3)
-
-- Versión móvil en **React Native** reutilizando esta misma API REST.
-- Escáner de código de barras con la cámara para armar el lote de rótulos.
-- Búsqueda de producto por EAN en el catálogo para autocompletar el rótulo.
-
 ---
 
-Proyecto académico desarrollado para la asignatura DPS941 de la Universidad Don Bosco. Uso educativo.
+## 13. Licencia
+
+Este proyecto (código, diseños, mockups y documentación) se publica bajo la licencia
+**Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)**:
+
+- **Atribución:** hay que dar crédito a los autores.
+- **No comercial:** no se puede usar con fines comerciales.
+- **Compartir igual:** las obras derivadas deben usar la misma licencia.
+
+Texto completo en [LICENSE](LICENSE) · Resumen: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+
+[![CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+Proyecto académico desarrollado para la asignatura DPS941 de la Universidad Don Bosco.

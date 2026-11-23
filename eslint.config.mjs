@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // la app movil (React Native) tiene su propio proyecto en movil/
+    "movil/**",
   ]),
 ]);
 
