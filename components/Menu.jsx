@@ -7,6 +7,7 @@ import { useSesion } from "@/components/Sesion";
 const enlaces = [
   { href: "/home", texto: "Inicio", icono: "fa-house" },
   { href: "/home/crear-afiches", texto: "Crear afiches", icono: "fa-circle-plus" },
+  { href: "/home/productos", texto: "Mis productos", icono: "fa-box" },
   { href: "/home/historial", texto: "Historial", icono: "fa-clock" },
 ];
 

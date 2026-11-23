@@ -2,10 +2,8 @@
 import { useEffect, useState } from "react";
 import Cargando from "@/components/loading";
 import { toast } from "sonner";
-import axios from "axios";
-
-const fechaCorta = (valor) =>
-  new Date(valor).toLocaleDateString("es", { day: "numeric", month: "short" });
+import { fechaCorta } from "@/lib/fechas";
+import { listarRotulosDeTodos } from "@/lib/admin";
 
 const fechaLarga = (valor) =>
   new Date(valor).toLocaleDateString("es", {
@@ -21,10 +19,10 @@ const AdminRotulos = () => {
 
   const cargarRotulos = async () => {
     try {
-      const { data } = await axios.get("/api/admin/rotulos");
-      setRotulos(data);
+      // rotulos de todos los usuarios, creados desde la web o desde el celular
+      setRotulos(await listarRotulosDeTodos());
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudieron cargar los rotulos");
+      toast.error(error.message ?? "No se pudieron cargar los rotulos");
     } finally {
       setCargando(false);
     }

@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import Cargando from "@/components/loading";
 import { toast } from "sonner";
 import Link from "next/link";
-import axios from "axios";
+import BotonPdf from "@/components/BotonPdf";
+import { listarDocumentos } from "@/lib/rotulos";
 
 const fechaLarga = (valor) =>
   new Date(valor).toLocaleDateString("es", {
@@ -18,10 +19,9 @@ const Historial = () => {
 
   const cargarDocumentos = async () => {
     try {
-      const { data } = await axios.get("/api/documentos");
-      setDocumentos(data);
+      setDocumentos(await listarDocumentos());
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo cargar tu historial");
+      toast.error(error.message ?? "No se pudo cargar tu historial");
     } finally {
       setCargando(false);
     }
@@ -77,10 +77,7 @@ const Historial = () => {
                     {fechaLarga(d.fecha_creacion)}
                   </div>
                 </div>
-                <a href={d.url_pdf} target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm transition-all px-4 py-2 border border-neutral-300 text-black hover:bg-neutral-100 active:bg-neutral-200">
-                  <i className="fa-jelly-duo fa-regular fa-arrow-down-to-line"></i>
-                  PDF
-                </a>
+                <BotonPdf documentoId={d.id} />
               </article>
             );
           })}

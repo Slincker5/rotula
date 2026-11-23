@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import axios from "axios";
+import BotonPdf from "@/components/BotonPdf";
+import { useSesion } from "@/components/Sesion";
+import { deTextoFecha } from "@/lib/fechas";
+import { listarDocumentos, listarRotulos } from "@/lib/rotulos";
 import Cargando from "@/components/loading";
 
 const monthlyLimit = 10;
@@ -18,7 +21,7 @@ const fechaLarga = (valor) =>
 
 const Home = () => {
   const [todayLabel, setTodayLabel] = useState("");
-  const [usuario, setUsuario] = useState(null);
+  const { usuario } = useSesion();
   const [rotulos, setRotulos] = useState([]);
   const [documentos, setDocumentos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -29,21 +32,19 @@ const Home = () => {
       day: "numeric",
       month: "long",
     });
+    // la fecha se calcula en el navegador para que no salga la del servidor de Vercel
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTodayLabel(today.charAt(0).toUpperCase() + today.slice(1));
   }, []);
 
   const cargarInicio = async () => {
     try {
-      const usuarioApi = await axios.get("/api/usuario");
-      setUsuario(usuarioApi.data.usuario);
-
-      const rotulosApi = await axios.get("/api/rotulos");
-      setRotulos(rotulosApi.data);
-
-      const documentosApi = await axios.get("/api/documentos");
-      setDocumentos(documentosApi.data);
+      // los mismos datos que ve la app movil: usuarios/{uid}/rotulos y documentos
+      const [listaRotulos, listaDocumentos] = await Promise.all([listarRotulos(), listarDocumentos()]);
+      setRotulos(listaRotulos);
+      setDocumentos(listaDocumentos);
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo cargar tu inicio");
+      toast.error(error.message ?? "No se pudo cargar tu inicio");
     } finally {
       setCargando(false);
     }
@@ -59,9 +60,9 @@ const Home = () => {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  const activas = rotulos.filter((r) => new Date(r.fecha_fin) >= hoy);
+  const activas = rotulos.filter((r) => deTextoFecha(r.fecha_fin) >= hoy);
   const porVencer = activas.filter(
-    (r) => new Date(r.fecha_fin).getTime() < hoy.getTime() + 7 * DIA,
+    (r) => deTextoFecha(r.fecha_fin).getTime() < hoy.getTime() + 7 * DIA,
   );
   const usedThisMonth = rotulos.filter((r) => {
     const creado = new Date(r.fecha_creacion);
@@ -154,10 +155,7 @@ const Home = () => {
                     {d.total_rotulos} rótulos · {fechaLarga(d.fecha_creacion)}
                   </div>
                 </div>
-                <a href={d.url_pdf} target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-1.5 rounded-full font-heading font-bold text-sm transition-all hover:scale-105 active:scale-95 px-4 py-2 border border-neutral-300 text-black hover:bg-neutral-100 active:bg-neutral-200">
-                  <i className="fa-jelly-duo fa-regular fa-arrow-down-to-line"></i>
-                  PDF
-                </a>
+                <BotonPdf documentoId={d.id} />
               </article>
             ))}
           </div>

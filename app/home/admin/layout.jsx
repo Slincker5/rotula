@@ -8,7 +8,6 @@ import { useSesion } from "@/components/Sesion";
 
 const enlaces = [
   { href: "/home/admin", texto: "Rótulos de usuarios", icono: "fa-tags" },
-  { href: "/home/admin/productos", texto: "Productos", icono: "fa-box" },
 ];
 
 // todo lo que cuelga de /home/admin pasa por aqui: si el perfil de Firestore

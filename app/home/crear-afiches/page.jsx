@@ -3,26 +3,12 @@ import { useEffect, useState } from "react";
 import Cargando from "@/components/loading";
 import { toast } from "sonner";
 import Link from "next/link";
-import axios from "axios";
+import { agregarRotulo, editarRotulo, generarDocumento, listarPendientes, quitarRotulo } from "@/lib/rotulos";
+import { descargarPdf } from "@/lib/pdf/generarRotulos";
+import { enDias, fechaCorta } from "@/lib/fechas";
+import { listarProductos } from "@/lib/productos";
 
 const POR_HOJA = 4;
-
-const pad = (n) => String(n).padStart(2, "0");
-
-// la API manda las fechas como ISO; el input date quiere YYYY-MM-DD
-const soloFecha = (valor) => {
-  const d = new Date(valor);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-};
-
-const fechaCorta = (valor) =>
-  new Date(valor).toLocaleDateString("es", { day: "numeric", month: "short" });
-
-const enDias = (dias) => {
-  const d = new Date();
-  d.setDate(d.getDate() + dias);
-  return soloFecha(d);
-};
 
 const CrearAfiches = () => {
   const [ean, setEan] = useState("");
@@ -37,6 +23,7 @@ const CrearAfiches = () => {
   const [documento, setDocumento] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [textoCarga, setTextoCarga] = useState("");
+  const [productos, setProductos] = useState([]);
 
   const limpiarFormulario = () => {
     setEan("");
@@ -51,11 +38,10 @@ const CrearAfiches = () => {
 
   const cargarRotulos = async () => {
     try {
-      const { data } = await axios.get("/api/rotulos");
-      // los que ya salieron en un PDF tienen documento_id
-      setPendientes(data.filter((r) => r.documento_id === null));
+      // los que ya salieron en un PDF tienen documento_id; aqui solo los pendientes
+      setPendientes(await listarPendientes());
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudieron cargar tus rotulos");
+      toast.error(error.message ?? "No se pudieron cargar tus rotulos");
     }
   };
 
@@ -64,7 +50,19 @@ const CrearAfiches = () => {
     // el setState de cargarRotulos ocurre despues del await, no dentro del efecto
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarRotulos();
+    // productos guardados (modulo Mis productos) para llenar el rotulo con un clic
+    listarProductos()
+      .then(setProductos)
+      .catch(() => setProductos([]));
   }, []);
+
+  const usarProducto = (id) => {
+    const producto = productos.find((p) => p.id === id);
+    if (!producto) return;
+    setEan(producto.ean ?? "");
+    setDescripcion(producto.descripcion);
+    setPrecioUnitario(String(producto.precio));
+  };
 
   const guardarRotulo = async (e) => {
     e.preventDefault();
@@ -81,22 +79,18 @@ const CrearAfiches = () => {
         fecha_fin: fechaFin,
       };
       // si estoy editando actualizo ese rotulo, si no creo uno nuevo
-      let respuesta;
+      // las reglas de negocio se validan en lib/rotulos.js y otra vez en firestore.rules
       if (editando) {
-        respuesta = await axios.put(`/api/rotulos/${editando}`, body);
+        await editarRotulo(editando, body);
+        toast.success("Rotulo actualizado");
       } else {
-        respuesta = await axios.post("/api/rotulos", body);
+        await agregarRotulo(body);
+        toast.success(`Se agregaron ${body.copias} rotulos a tu lista`);
       }
-      const data = respuesta.data;
-      if (!data.ok) {
-        toast.error(data.error);
-      } else {
-        toast.success(data.mensaje);
-        limpiarFormulario();
-        await cargarRotulos();
-      }
+      limpiarFormulario();
+      await cargarRotulos();
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo guardar el rotulo");
+      toast.error(error.message ?? "No se pudo guardar el rotulo");
     } finally {
       setCargando(false);
     }
@@ -109,8 +103,8 @@ const CrearAfiches = () => {
     setPrecioOferta(String(rotulo.precio_oferta));
     setPrecioUnitario(String(rotulo.precio_unitario));
     setCopias(String(rotulo.copias));
-    setFechaInicio(soloFecha(rotulo.fecha_inicio));
-    setFechaFin(soloFecha(rotulo.fecha_fin));
+    setFechaInicio(rotulo.fecha_inicio);
+    setFechaFin(rotulo.fecha_fin);
     document.getElementById("formulario")?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -119,32 +113,30 @@ const CrearAfiches = () => {
     try {
       setTextoCarga("Eliminando ...");
       setCargando(true);
-      const { data } = await axios.delete(`/api/rotulos/${rotulo.id}`);
-      if (!data.ok) {
-        toast.error(data.error);
-      } else {
-        toast.success(data.mensaje);
-        if (editando === rotulo.id) limpiarFormulario();
-        await cargarRotulos();
-      }
+      await quitarRotulo(rotulo.id);
+      toast.success("Rotulo quitado de tu lista");
+      if (editando === rotulo.id) limpiarFormulario();
+      await cargarRotulos();
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo eliminar el rotulo");
+      toast.error(error.message ?? "No se pudo eliminar el rotulo");
     } finally {
       setCargando(false);
     }
   };
 
-  // el endpoint no recibe datos: arma el PDF con los rotulos pendientes de la sesion
+  // arma el PDF en el navegador con los rotulos pendientes y lo registra en Firestore
   const generarPdf = async () => {
     try {
       setTextoCarga("Armando tu PDF ...");
       setCargando(true);
-      const { data } = await axios.post("/api/rotulos/pdf");
-      setDocumento(data);
+      const { bytes, ...data } = await generarDocumento();
+      descargarPdf(bytes, `rotulos-${data.id}.pdf`);
+      // enlace para volver a abrirlo sin generarlo otra vez
+      setDocumento({ ...data, url: URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })) });
       toast.success(`PDF listo: ${data.rotulos} rotulos en ${data.hojas} hojas`);
       await cargarRotulos();
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo generar el PDF");
+      toast.error(error.message ?? "No se pudo generar el PDF");
     } finally {
       setCargando(false);
     }
@@ -200,6 +192,27 @@ const CrearAfiches = () => {
           <h2 className="mb-5 text-[22px] font-bold tracking-tight">
             {editando ? "Editar rótulo" : "Nueva oferta"}
           </h2>
+
+          {productos.length > 0 && !editando && (
+            <div className="mb-4">
+              <label htmlFor="producto" className="block mb-2 text-sm font-medium">
+                Usar un producto guardado (opcional)
+              </label>
+              <select
+                id="producto"
+                defaultValue=""
+                onChange={(e) => usarProducto(e.target.value)}
+                className="block w-full rounded-xl border border-neutral-400 bg-white px-3 py-2.5 text-sm focus:border-black focus:outline-none"
+              >
+                <option value="">Elige un producto ...</option>
+                {productos.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.descripcion} · ${Number(p.precio).toFixed(2)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="mb-4">
             <label htmlFor="ean" className="block mb-2 text-sm font-medium">

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Cargando from "@/components/loading";
 import { toast } from "sonner";
-import axios from "axios";
+import { borrarProducto, crearProducto, editarProducto, listarProductos } from "@/lib/productos";
 
 const fechaLarga = (valor) =>
   new Date(valor).toLocaleDateString("es", {
@@ -11,7 +11,9 @@ const fechaLarga = (valor) =>
     year: "numeric",
   });
 
-const AdminProductos = () => {
+// Modulo secundario: catalogo del negocio. Es la misma lista de la pestaña Productos del celular
+// y se usa en Crear afiches para llenar el rotulo con un clic.
+const Productos = () => {
   const [ean, setEan] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
@@ -32,10 +34,9 @@ const AdminProductos = () => {
 
   const cargarProductos = async () => {
     try {
-      const { data } = await axios.get("/api/admin/productos");
-      setProductos(data);
+      setProductos(await listarProductos());
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudieron cargar los productos");
+      toast.error(error.message ?? "No se pudieron cargar los productos");
     }
   };
 
@@ -58,22 +59,17 @@ const AdminProductos = () => {
         imagen: imagen,
       };
       // si estoy editando actualizo ese producto, si no creo uno nuevo
-      let respuesta;
       if (editando) {
-        respuesta = await axios.put(`/api/admin/productos/${editando}`, body);
+        await editarProducto(editando, body);
+        toast.success("Producto actualizado");
       } else {
-        respuesta = await axios.post("/api/admin/productos", body);
+        await crearProducto(body);
+        toast.success("Producto agregado a tu catalogo");
       }
-      const data = respuesta.data;
-      if (!data.ok) {
-        toast.error(data.error);
-      } else {
-        toast.success(data.mensaje);
-        limpiarFormulario();
-        await cargarProductos();
-      }
+      limpiarFormulario();
+      await cargarProductos();
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo guardar el producto");
+      toast.error(error.message ?? "No se pudo guardar el producto");
     } finally {
       setCargando(false);
     }
@@ -93,16 +89,12 @@ const AdminProductos = () => {
     try {
       setTextoCarga("Eliminando ...");
       setCargando(true);
-      const { data } = await axios.delete(`/api/admin/productos/${producto.id}`);
-      if (!data.ok) {
-        toast.error(data.error);
-      } else {
-        toast.success(data.mensaje);
-        if (editando === producto.id) limpiarFormulario();
-        await cargarProductos();
-      }
+      await borrarProducto(producto.id);
+      toast.success("Producto eliminado");
+      if (editando === producto.id) limpiarFormulario();
+      await cargarProductos();
     } catch (error) {
-      toast.error(error.response?.data?.error ?? "No se pudo eliminar el producto");
+      toast.error(error.message ?? "No se pudo eliminar el producto");
     } finally {
       setCargando(false);
     }
@@ -124,10 +116,10 @@ const AdminProductos = () => {
 
       <section>
         <h1 className="text-[clamp(28px,3.4vw,44px)] font-bold leading-[1.08] tracking-tight">
-          Productos
+          Mis productos
         </h1>
         <p className="mt-3 max-w-[60ch] text-base leading-relaxed text-neutral-800">
-          Catálogo de productos con su código de barras y precio base.
+          Los productos de tu negocio con su código de barras y precio. Son los mismos que ves en la app móvil y los puedes usar al crear un afiche.
         </p>
       </section>
 
@@ -278,7 +270,7 @@ const AdminProductos = () => {
                     <div className="truncate font-semibold">{p.descripcion}</div>
                     <div className="text-[13px] text-neutral-700">
                       {p.ean ? `${p.ean} · ` : ""}
-                      {fechaLarga(p.fecha_creacion)} · {p.nombre} {p.apellido}
+                      {fechaLarga(p.fecha_creacion)}
                     </div>
                   </div>
                   <div className="text-xl font-extrabold leading-none tracking-tight text-accent2-600">
@@ -308,4 +300,4 @@ const AdminProductos = () => {
   );
 };
 
-export default AdminProductos;
+export default Productos;
